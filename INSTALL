@@ -1,0 +1,5 @@
+To install PyZio run:
+
+	# python setup.py install
+
+This command install PyZio in the proper path for your python installation
