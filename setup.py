@@ -9,5 +9,5 @@ setup(name='PyZio',
       author_email='federico.vaga@gmail.com',
       url='',
       packages=['PyZio'],
-      license='GPL',
+      license='GPLv2',
      )

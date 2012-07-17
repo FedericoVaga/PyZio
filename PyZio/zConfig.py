@@ -1,7 +1,7 @@
 """
 @author: Federico Vaga
 @copyright: Federico Vaga 2012
-@license: GPL
+@license: GPLv2
 """
 
 zio_bus_path = "/sys/bus/zio/"

@@ -1,14 +1,14 @@
 """
 @author: Federico Vaga
 @copyright: Federico Vaga 2012
-@license: GPL
+@license: GPLv2
 """
 import os
 import struct
 
 class zCtrl(object):
     def __init__(self, path, name):
-        self.file = os.path.join(path, name)
+        self.fullPath = os.path.join(path, name)
         # control information
         self.major_verion = None
         self.minor_varion = None
@@ -32,7 +32,7 @@ class zCtrl(object):
         self.attr_trigger = None
         
     def getControl(self):
-        f = open(self.file, "r")
+        f = open(self.fullPath, "r")
         data = f.read(512)
         f.close()
         # This unpack the control structure element by element

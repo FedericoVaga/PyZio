@@ -1,7 +1,7 @@
 """
 @author: Federico Vaga
 @copyright: Federico Vaga 2012
-@license: GPL
+@license: GPLv2
 """
 
 __all__ = ["zDev", "zCset", "zChan", "zTrig", "zBuf", "zUtil", "zConfig",\
