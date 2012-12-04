@@ -10,16 +10,17 @@ from .zAttribute import zAttribute
 from .zChan import zChan
 from .zTrig import zTrig
 
+'''
+This class describe the zio_cset object from the ZIO framework
+'''
 class zCset(object, zObject):
-    """This class describe the zio_cset object from the ZIO framework"""
-
+    '''
+    - set up name and patch of cset in sysfs tree
+    - retrieve cset attributes
+    - retrieve cset's channels
+    - retrieve trigger
+    '''
     def __init__(self, path, name):
-        """
-        - set up name and patch of cset in sysfs tree
-        - retrieve cset attributes
-        - retrieve cset's channels
-        - retrieve trigger
-        """
         zObject.__init__(self, path, name)
         self.chan = [] # list of channels child
         self.trigger = None
@@ -40,30 +41,41 @@ class zCset(object, zObject):
                 # otherwise is an attribute
                 newAttr = zAttribute(self.fullPath, el)
                 self.attribute[el] = newAttr
+        
+        # Creates the list of cset children
+        self.obj_children.append(self.trigger)
+        self.obj_children.extend(self.chan)
     
-    def refreshAttributes(self):
-        """update the value of all cset attribute"""
-        self.updateAttributes()
-        self.__updateChildrenAttributes(self.chan)
-        self.__updateChildrenAttributes(self.trigger)
-        pass
     
+    '''
+    getCurrentBuffer
+    It returns the current buffer for all channels within this device
+    '''
     def getCurrentBuffer(self):
-        """get the current buffer for all channels within this device"""
         return self.attribute["current_buffer"].read()
-    
+
+    '''
+    setCurrentBuffer
+    It sets the current buffer for all channels within this cset. Then update
+    the buffer for each channel
+    '''
     def setCurrentBuffer(self, bufType):
-        """set the current buffer for all channels within this device"""
         self.attribute["current_buffer"].write(bufType)
         for chan in self.chan:
             chan.updateBuffer();
-    
+
+    '''
+    getCurrentTrigger
+    It returns a string with the current trigger name
+    '''
     def getCurrentTrigger(self):
-        """get the current trigger for this cset"""
         return self.attribute["current_trigger"].read()
-    
+
+    '''
+    setCurrentTrigger
+    It sets the current trigger for this cset.
+    '''
     def setCurrentTrigger(self, trigType):
-        """Set the current trigger for this cset"""
         self.attribute["current_trigger"].write(trigType)
         fullPath = self.trigger.path;
         self.trigger = zTrig(fullPath, "trigger")

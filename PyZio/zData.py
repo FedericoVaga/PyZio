@@ -5,24 +5,24 @@
 """
 
 import os
+import sys
 import struct
 
 class zData(object):
     def __init__(self, path, name, ctrl):
-        self.file = os.path.join(path, name)
+        self.fullPath = os.path.join(path, name)
         self.ctrl = ctrl
         self.data = None
-    
+        self.readable = True if os.access(self.fullPath, os.R_OK) else False
+        self.writable = True if os.access(self.fullPath, os.W_OK) else False
+
     '''
-    updateCtrl is a boolean value, if true read control before read
-    unpackData is a boolean value, if true data is unpacked
+    __unpack_data
+    data: data to unpack
+    nsamples: nsamples in data
+    unpack data according to ssize
     '''
-    def readData(self, updateCtrl, unpackData):
-        self.ctrl.getControl()
-        
-        f = open(self.file, "r")
-        self.data = f.read(self.ctrl.ssize * self.ctrl.nsamples)
-        
+    def __unpack_data(self, data, nsamples):
         format = "b"
         if self.ctrl.ssize == 1:
             format = "B"
@@ -32,11 +32,31 @@ class zData(object):
             format = "I"
         elif self.ctrl.ssize == 8:
             format = "Q"
-             
-        self.data = struct.unpack((str(self.ctrl.nsamples) + format), self.data)
-        
-        f.close()
-        return self.data
+        return struct.unpack((str(nsamples) + format), data)
     
+    '''
+    readData
+    readCtrl: is a boolean value, if true read control before read
+    unpackData: is a boolean value, if true data is unpacked
+    '''
+    def readData(self, readCtrl, unpackData):
+        if readCtrl:
+            self.ctrl.get_ctrl()
+        with open(self.fullPath, "r") as f:
+            try:
+                data_tmp = f.read(self.ctrl.ssize * self.ctrl.nsamples)
+                if unpackData:
+                    self.data = self.__unpack_data(data_tmp, self.ctrl.nsamples)
+                else:
+                    self.data = data_tmp
+            except IOError as e:
+                print("I/O error({0}): {1}".format(e.errno, e.strerror))
+                return -e.errno
+            except:
+                print("Unexpected error:", sys.exc_info()[0])
+                return -2
+                raise
+        return self.data
+
     def writeData(self):
         pass

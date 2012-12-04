@@ -8,8 +8,10 @@ import os
 from .zObject import zObject
 from .zAttribute import zAttribute
 
+'''
+This class describe the zio_bi object from the ZIO framework
+'''
 class zBuf(object, zObject):
-    """This class describe the zio_bi object from the ZIO framework"""
     def __init__(self, path, name):
         zObject.__init__(self, path, name)
         

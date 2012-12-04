@@ -9,6 +9,10 @@ import string
 from .zDev import zDev
 from .zConfig import zio_bus_path, devices_path, devices, buffers, triggers
 
+'''
+isLoaded
+It returns true if ZIO is loaded correctly, otherwise it returns false
+'''
 def isLoaded():
     if not os.path.exists(zio_bus_path):
         print("ZIO is not loaded")
@@ -20,16 +24,23 @@ def isLoaded():
         return False
     return True
 
-
+'''
+updateDevices
+It updates the internal list of available devices
+'''
 def updateDevices():
     del devices[:]
     for zdev in os.listdir(devices_path):
-        if string.find(zdev, "zio-") == -1:
+        if string.find(zdev, "hw-") == -1:
             continue
         newDev = zDev(devices_path, zdev)
         devices.append(newDev)
     pass
 
+'''
+updateBuffers
+It updates the internal list of available buffers
+'''
 def updateBuffers():
     del buffers[:]
     # read all available buffers
@@ -39,6 +50,10 @@ def updateBuffers():
     f.close()
     pass
 
+'''
+updateTriggers
+It updates the internal list of available triggers
+'''
 def updateTriggers():
     del triggers[:]
     # read all available triggers
@@ -48,6 +63,9 @@ def updateTriggers():
     f.close()
     pass
 
+'''
+It updates the internal list of available devices, buffers and triggers
+'''
 def updateAll():
     updateDevices()
     updateTriggers()

@@ -13,6 +13,9 @@ from .zCtrl import zCtrl
 from .zData import zData
 from .zConfig import zio_cdev_path
 
+'''
+This class describe the zio channel object
+'''
 class zChan(object, zObject):
     '''
     Constructor
@@ -56,29 +59,29 @@ class zChan(object, zObject):
                               self.ctrlcdev)
         pass
     
-    def refreshAttributes(self):
-        self.updateAttributes()
-        self.__updateChildrenAttributes(self.buffer)
-        pass
-    
+    '''
+    It updates the buffer object for this channel. If user change the
+    current buffer from cset, all the buffer instance within channels must
+    be update
+    '''
     def updateBuffer(self):
-        """It updates the buffer object for this channel. If user change the
-        current buffer from cset, all the buffer instance within channels must
-        be update"""
         self.buffer = zBuf(self.fullPath, "buffer")
         pass
     
-    def pullData(self, updateCtrl, unpackData):
-        """It pulls data from the device. At the moment only char device
-        interface is supported"""
+    '''
+    It pulls data from the device. At the moment only char device
+    interface is supported
+    '''
+    def readData(self, updateCtrl, unpackData):
         if self.isEnable():
             return self.datacdev.readData(updateCtrl, unpackData)
         return None
-        pass
     
-    def pushData(self):
-        """It pushes data to the device. At the moment only char device
-        interface is supported"""
+    '''
+    It pushes data to the device. At the moment only char device
+    interface is supported
+    '''
+    def writeData(self):
         if self.isEnable():
             self.datacdev.writeData()
         pass

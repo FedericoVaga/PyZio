@@ -4,61 +4,154 @@
 @license: GPLv2
 """
 import os
+import sys
 import struct
 
+class zCtrlAttr(object):
+    def __init__(self, sm, em, sattr, eattr):
+        self.std_mask = sm
+        self.ext_mask = em
+        self.std_val = list(sattr)
+        self.ext_val = list(eattr)
+
+class zTLV(object):
+    def __init__(self, t, l, v):
+        self.type = t
+        self.len = l
+        self.val = v
+
+class zAddress(object):
+    def __init__(self, fam, htype, hid, did, cset, chan, dev):
+        self.sa_family = fam
+        self.host_type = htype
+        self.hostid = hid
+        self.dev_id = did
+        self.cset_i = cset
+        self.chan_i = chan
+        self.devname = dev
+
+class zTimeStamp(object):
+    def __init__(self, s, t, b):
+        self.seconds = s
+        self.ticks = t
+        self.bins = b
+
 class zCtrl(object):
-    def __init__(self, path, name):
-        self.fullPath = os.path.join(path, name)
-        # control information
-        self.major_verion = None
-        self.minor_varion = None
-        self.more_ctrl = None
-        self.alarms = None
-        self.seq_num = None
-        self.flags = None
-        self.nsamples = None
-        self.ssize = None
-        self.nbits = None
-        self.hostid = None
-        self.devname = None
-        self.dev_id = None
-        self.cset_i = None
-        self.chan_i = None
+    def __init__(self):
+        # Description of the control structure field's length
+        self.packstring = "4B2I2H1H2B8BI2H12s3Q3I12s2HI16I32I2HI16I32I2I8B"
+        #                  ^ ^ ^ ^           ^ ^ ^  ^        ^        ^
+
+        # Control information
+        self.major_version = 0
+        self.minor_version = 0
+        self.alarms_zio = 0
+        self.alarms_dev = 0
+        self.seq_num = 0
+        self.nsamples = 0
+        self.ssize = 0
+        self.nbits = 0
+        self.mem_offset = 0
+        self.reserved = 0
+        self.flags = 0
+        self.triggername = ""
+        # ZIO Address
+        self.addr = None
+        # ZIO Time Stamp
         self.tstamp = None
-        self.mem_offset = None
-        self.reserved = None
-        self.triggername = None
+        # Device and Trigger Attributes
         self.attr_channel = None
         self.attr_trigger = None
-        
-    def getControl(self):
-        f = open(self.fullPath, "r")
+        # ZIO TLV
+        self.tlv = None
+
+    def get_ctrl(self, path):
+        f = open(path, "r")
         data = f.read(512)
         f.close()
         # This unpack the control structure element by element
-        ctrl = struct.unpack("4B3I2H8B12sI2H3Q2I12s2HI16I32I2HI16I32I20B",data)
-        self.major_verion = ctrl[0]
-        self.minor_varion = ctrl[1]
-        self.more_ctrl = ctrl[2]
-        self.alarms = ctrl[3]
+        ctrl = struct.unpack(self.packstring, data)
+        # 4B
+        self.major_version = ctrl[0]
+        self.minor_version = ctrl[1]
+        self.alarms_zio = ctrl[2]
+        self.alarms_dev = ctrl[3]
+        # 2I
         self.seq_num = ctrl[4]
-        self.flags = ctrl[5]
-        self.nsamples = ctrl[6]
-        self.ssize = ctrl[7]
-        self.nbits = ctrl[8]
-        self.hostid = ctrl[9:16]
-        self.devname = ctrl[17]
-        self.dev_id = ctrl[18]
-        self.cset_i = ctrl[19]
-        self.chan_i = ctrl[20]
-        self.tstamp = ctrl[21:23]
-        self.mem_offset = ctrl[24]
-        self.reserved = ctrl[25]
-        self.triggername = ctrl[26]
-        self.attr_channel = ctrl[27:77]
-        self.attr_trigger = ctrl[78:128]
-        
+        self.nsamples = ctrl[5]
+        # 2H
+        self.ssize = ctrl[6]
+        self.nbits = ctrl[7]
+        # 1H2B8BI2H12s
+        # ctrl[10] is a filler
+        self.addr = zAddress(ctrl[8], ctrl[9], ctrl[11:19], \
+                             ctrl[19], ctrl[20], ctrl[21], ctrl[22])
+        # 3Q
+        self.tstamp = zTimeStamp(ctrl[23], ctrl[24], ctrl[25]);
+        # 3I
+        self.mem_offset = ctrl[26]
+        self.reserved = ctrl[27]
+        self.flags = ctrl[28]
+        # 12s
+        self.triggername = ctrl[29]
+        # 2HI16I32I
+        self.attr_channel = zCtrlAttr(ctrl[30], ctrl[32], ctrl[33:49], \
+                                      ctrl[49:81])
+        # 2HI16I32I
+        self.attr_trigger = zCtrlAttr(ctrl[81], ctrl[83], ctrl[84:100], \
+                                      ctrl[100:132])
+        self.tlv = zTLV(ctrl[132], ctrl[133], ctrl[134:142])
         pass
-    def setControl(self):
-        # FIXME develop me
+
+    def set_ctrl(self, path):
+        # Create pack_list because I cannot do multiple * in the same pack
+        pack_list = []
+        pack_list.append(self.major_version)
+        pack_list.append(self.minor_version)
+        pack_list.append(self.alarms_zio)
+        pack_list.append(self.alarms_dev)
+        pack_list.append(self.seq_num)
+        pack_list.append(self.nsamples)
+        pack_list.append(self.ssize)
+        pack_list.append(self.nbits)
+        pack_list.append(self.addr.sa_family)
+        pack_list.append(self.addr.host_type)
+        pack_list.append(0) # filler
+        pack_list.extend(self.addr.hostid)
+        pack_list.append(self.addr.dev_id)
+        pack_list.append(self.addr.cset_i)
+        pack_list.append(self.addr.chan_i)
+        pack_list.append(self.addr.devname)
+        pack_list.append(self.tstamp.seconds)
+        pack_list.append(self.tstamp.ticks)
+        pack_list.append(self.tstamp.bins)
+        pack_list.append(self.mem_offset)
+        pack_list.append(self.reserved)
+        pack_list.append(self.flags)
+        pack_list.append(self.triggername)
+        pack_list.append(self.attr_channel.std_mask)
+        pack_list.append(0) # filler
+        pack_list.append(self.attr_channel.ext_mask)
+        pack_list.extend(self.attr_channel.std_val)
+        pack_list.extend(self.attr_channel.ext_val)
+        pack_list.append(self.attr_trigger.std_mask)
+        pack_list.append(0) # filler
+        pack_list.append(self.attr_trigger.ext_mask)
+        pack_list.extend(self.attr_trigger.std_val)
+        pack_list.extend(self.attr_trigger.ext_val)
+        pack_list.append(self.tlv.type)
+        pack_list.append(self.tlv.len)
+        pack_list.extend(self.tlv.val)
+        # Pack all the control value. use * to unpack list
+        ctrl = struct.pack(self.packstring, *pack_list)
+        # and write it
+        with open(path, 'w') as f:
+            try:
+                f.write(ctrl)
+            except IOError as e:
+                print("I/O error({0}): {1}".format(e.errno, e.strerror))
+            except:
+                print("Unexpected error:", sys.exc_info()[0])
+                raise
+
         pass

@@ -9,9 +9,10 @@ from .zObject import zObject
 from .zAttribute import zAttribute
 from .zCset import zCset
 
+'''
+zDev class describe the zio_device object from the ZIO framework
+'''
 class zDev(object, zObject):
-    """zDev class describe the zio_device object from the ZIO framework"""
-    
     def __init__(self, path, name):
         zObject.__init__(self, path, name)
         self.cset = [] # list of csets child
@@ -28,9 +29,4 @@ class zDev(object, zObject):
                 # otherwise is an attribute
                 newAttr = zAttribute(self.fullPath, el)
                 self.attribute[el] = newAttr
-        pass
-    
-    def refreshAttributes(self):
-        self.updateAttributes()
-        self.__updateChildrenAttributes(self.cset)
         pass
