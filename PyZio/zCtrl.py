@@ -37,7 +37,8 @@ class zTimeStamp(object):
         self.bins = b
 
 class zCtrl(object):
-    def __init__(self):
+    def __init__(self, path):
+        self.path = path
         # Description of the control structure field's length
         self.packstring = "4B2I2H1H2B8BI2H12s3Q3I12s2HI16I32I2HI16I32I2I8B"
         #                  ^ ^ ^ ^           ^ ^ ^  ^        ^        ^
@@ -65,8 +66,8 @@ class zCtrl(object):
         # ZIO TLV
         self.tlv = None
 
-    def get_ctrl(self, path):
-        f = open(path, "r")
+    def getCtrl(self):
+        f = open(self.path, "r")
         data = f.read(512)
         f.close()
         # This unpack the control structure element by element
@@ -103,7 +104,13 @@ class zCtrl(object):
         self.tlv = zTLV(ctrl[132], ctrl[133], ctrl[134:142])
         pass
 
-    def set_ctrl(self, path):
+    def isValid(self):
+        # nsamples must be pre_samples + post_samples
+        if self.nsamples != self.attr_trigger.std_val[1] + self.attr_trigger.std_val[2]:
+            return False
+        return True
+
+    def setCtrl(self):
         # Create pack_list because I cannot do multiple * in the same pack
         pack_list = []
         pack_list.append(self.major_version)
@@ -145,13 +152,13 @@ class zCtrl(object):
         # Pack all the control value. use * to unpack list
         ctrl = struct.pack(self.packstring, *pack_list)
         # and write it
-        with open(path, 'w') as f:
+        with open(self.path, 'w') as f:
             try:
                 f.write(ctrl)
             except IOError as e:
                 print("I/O error({0}): {1}".format(e.errno, e.strerror))
+                raise
             except:
                 print("Unexpected error:", sys.exc_info()[0])
                 raise
-
         pass

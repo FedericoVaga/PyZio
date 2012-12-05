@@ -9,24 +9,32 @@ from .zObject import zObject
 from .zAttribute import zAttribute
 from .zCset import zCset
 
-'''
-zDev class describe the zio_device object from the ZIO framework
-'''
 class zDev(object, zObject):
+    """zDev class describe the zio_device object from the ZIO framework. It
+    inherits from zObject"""
+
     def __init__(self, path, name):
+        """Constructor for zDev class. It calls the __init__ function
+        from zObject for a generic initialization; then it looks for attributes
+        and csets in its directory"""
+
+        # Generic initialization
         zObject.__init__(self, path, name)
-        self.cset = [] # list of csets child
-        
+        # list of cset children
+        self.cset = []
+        # Look into directory for cset and attributes
         for el in os.listdir(self.fullPath):
-            if not self.isValidSysfsAttribute(el):
+            # Skip if invalid element
+            if not self.isValidSysfsElement(el):
                 continue
-            
+
+            # if a valid sysfs element is a directory, then it is a cset
             if os.path.isdir(os.path.join(self.fullPath, el)):
-                # if a sysfs element is a directory, then is a cset
                 newCset = zCset(self.fullPath, el)
                 self.cset.append(newCset)
+            # otherwise is an attribute
             else:
-                # otherwise is an attribute
-                newAttr = zAttribute(self.fullPath, el)
-                self.attribute[el] = newAttr
-        pass
+                self.attribute[el] = zAttribute(self.fullPath, el)
+
+        # Update the zObject children list
+        self.obj_children.extend(self.cset)

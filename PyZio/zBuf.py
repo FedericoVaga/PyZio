@@ -8,17 +8,19 @@ import os
 from .zObject import zObject
 from .zAttribute import zAttribute
 
-'''
-This class describe the zio_bi object from the ZIO framework
-'''
 class zBuf(object, zObject):
+    """zBuf class describe the zio_bi object from the ZIO framework. It
+    inherits from zObject"""
+
     def __init__(self, path, name):
+        """Constructor for zBuf class. It calls the __init__ function
+        from zObject for a generic initialization; then it looks for attributes
+        in its directory"""
         zObject.__init__(self, path, name)
-        
+        # Inspect all files and directory
         for el in os.listdir(self.fullPath):
+            # Skip if the element it is not valid
             if not self.isValidSysfsAttribute(el):
                 continue
-            
-            newAttr = zAttribute(self.fullPath, el)
-            self.attribute[el] = newAttr
-        pass
+            # All the valid element are attributes
+            self.attribute[el] = zAttribute(self.fullPath, el)

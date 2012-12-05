@@ -11,7 +11,6 @@ import struct
 class zData(object):
     def __init__(self, path, name, ctrl):
         self.fullPath = os.path.join(path, name)
-        self.ctrl = ctrl
         self.data = None
         self.readable = True if os.access(self.fullPath, os.R_OK) else False
         self.writable = True if os.access(self.fullPath, os.W_OK) else False
@@ -33,15 +32,13 @@ class zData(object):
         elif self.ctrl.ssize == 8:
             format = "Q"
         return struct.unpack((str(nsamples) + format), data)
-    
+
     '''
     readData
     readCtrl: is a boolean value, if true read control before read
     unpackData: is a boolean value, if true data is unpacked
     '''
-    def readData(self, readCtrl, unpackData):
-        if readCtrl:
-            self.ctrl.get_ctrl()
+    def readData(self, unpackData):
         with open(self.fullPath, "r") as f:
             try:
                 data_tmp = f.read(self.ctrl.ssize * self.ctrl.nsamples)
@@ -58,5 +55,5 @@ class zData(object):
                 raise
         return self.data
 
-    def writeData(self):
+    def writeData(self, data):
         pass
