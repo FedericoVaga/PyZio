@@ -3,8 +3,7 @@
 @copyright: Federico Vaga 2012
 @license: GPLv2
 """
-import os
-import sys
+
 import struct
 
 class zCtrlAttr(object):

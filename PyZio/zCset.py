@@ -27,7 +27,7 @@ class zCset(object, zObject):
         # Look into directory for channels and attributes
         for el in os.listdir(self.fullPath):
             # Skip if invalid element
-            if not self.isValidSysfsAttribute(el):
+            if not self.isValidSysfsElement(el):
                 continue
             # If the element is "trigger", then create a trigger instance and
             # continue to the next element

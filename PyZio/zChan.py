@@ -4,7 +4,6 @@
 @license: GPLv2
 """
 import os
-import copy
 import errno
 
 from .zObject import zObject
@@ -29,7 +28,7 @@ class zChan(object, zObject):
         # Inspect all files and directory
         for el in os.listdir(self.fullPath):
             # Skip if the element it is not valid
-            if not self.isValidSysfsAttribute(el):
+            if not self.isValidSysfsElement(el):
                 continue
             # If the element is "buffer" then create a zBuf instance
             if el == "buffer":

@@ -17,7 +17,7 @@ def isLoaded():
     if not os.path.exists(zio_bus_path):
         print("ZIO is not loaded")
         return False
-        
+
     if not os.access(zio_bus_path + "/available_buffers", os.R_OK) and \
        not os.access(zio_bus_path + "/available_triggers", os.R_OK):
         print("ZIO is not loaded correctly")
@@ -31,7 +31,9 @@ It updates the internal list of available devices
 def updateDevices():
     del devices[:]
     for zdev in os.listdir(devices_path):
-        if string.find(zdev, "hw-") == -1:
+        print("Device found: " +  zdev)
+        if string.find(zdev, "hw-") == 0:
+            print("  skip because is HW device")
             continue
         newDev = zDev(devices_path, zdev)
         devices.append(newDev)

@@ -20,7 +20,7 @@ class zTrig(object, zObject):
         # Inspect all files and directory
         for el in os.listdir(self.fullPath):
             # Skip if the element it is not valid
-            if not self.isValidSysfsAttribute(el):
+            if not self.isValidSysfsElement(el):
                 continue
             # All the valid element are attributes
             self.attribute[el] = zAttribute(self.fullPath, el)
