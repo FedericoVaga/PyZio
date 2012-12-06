@@ -17,11 +17,11 @@ class zAttribute(object):
         self.name = name
         self.path = path
         self.fullPath = os.path.join(path, name)
-        self.value = self.__read(self.fullPath)
 
         self.readable = True if os.access(self.fullPath, os.R_OK) else False
         self.writable = True if os.access(self.fullPath, os.W_OK) else False
-        pass
+        print("Attribute found: " + self.fullPath)
+        self.getValue()
 
     def getValue(self):
         """It reads the sysfs file of the attribute and it store the value in
@@ -29,51 +29,32 @@ class zAttribute(object):
         if not self.readable:
             return -errno.EPERM
 
-        val = self.__read(self.fullPath)
-        if val >= 0:
-            self.value = val
-        return val
-
-    def setValue(self, val):
-        """It writes the sysfs attribute with the val parameter. If no
-        error occurs, it stores the new value in self.value."""
-        if not self.writable:
-            return -errno.EPERM
-
-        err = self.__write(self.fullPath, val)
-        if err == 0:
-            self.value = val
-        return err
-
-
-    def __read(self, path, val):
-        """ The function read from the sysfs file a value and it returns
-        immediatly. This function handle exception"""
-        with open(path, "r") as f:
+        with open(self.fullPath, "r") as f:
             try:
-                val = f.read().rstrip("\n\r")
-                return val
+                self.value = f.read().rstrip("\n\r")
+                return self.value
             except IOError as e:
                 print("I/O error({0}): {1}".format(e.errno, e.strerror))
-
             except:
                 print("Unexpected error:", sys.exc_info()[0])
                 raise
 
-    def __write(self, path, val):
-        """The function convert the value into string and it write on the
+    def setValue(self, val):
+        """It writes the sysfs attribute with the val parameter. If no
+        error occurs, it stores the new value in self.value.
+        The function convert the value into string and it write on the
         sysfs file. It does not matter if val is an integer or a string, this
-        function always convert to string before writing. This function handle
-        the exception."""
+        function always convert to string before writing."""
+        if not self.writable:
+            return -errno.EPERM
+
         w = str(val)
-        with open(path, "w") as f:
+        with open(self.fullPath, "w") as f:
             try:
                 f.write(w)
+                self.value = val
             except IOError as e:
                 print("I/O error({0}): {1}".format(e.errno, e.strerror))
-                return -e.errno
             except:
                 print("Unexpected error:", sys.exc_info()[0])
-                return -2
-        #self.read() # Theorically useless
-        return 0
+                raise

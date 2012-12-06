@@ -48,22 +48,22 @@ class zCset(object, zObject):
 
     def getCurrentBuffer(self):
         """It returns the current buffer for all channels within this device"""
-        return self.attribute["current_buffer"].read()
+        return self.attribute["current_buffer"].getValue()
 
     def setCurrentBuffer(self, bufType):
         """It sets the current buffer for all channels within this cset. Then
         update the buffer for each channel"""
-        self.attribute["current_buffer"].write(bufType)
+        self.attribute["current_buffer"].setValue(bufType)
         for chan in self.chan:
             chan.updateBuffer();
 
     def getCurrentTrigger(self):
         """It returns a string with the current trigger name"""
-        return self.attribute["current_trigger"].read()
+        return self.attribute["current_trigger"].getValue()
 
     def setCurrentTrigger(self, trigType):
         """It sets the current trigger for this cset. and change the trigger
         instance"""
-        self.attribute["current_trigger"].write(trigType)
+        self.attribute["current_trigger"].setValue(trigType)
         fullPath = self.trigger.path;
         self.trigger = zTrig(fullPath, "trigger")
