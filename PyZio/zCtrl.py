@@ -37,41 +37,25 @@ class zTimeStamp(object):
         self.bins = b
 
 class zCtrl(object):
-    def __init__(self, path):
-        self.path = path
+    def __init__(self):
         # Description of the control structure field's length
         self.packstring = "4B2I2H1H2B8BI2H12s3Q3I12s2HI16I32I2HI16I32I2I8B"
         #                  ^ ^ ^ ^           ^ ^ ^  ^        ^        ^
+        self.clear()
 
-        # Control information
-        self.major_version = 0
-        self.minor_version = 0
-        self.alarms_zio = 0
-        self.alarms_dev = 0
-        self.seq_num = 0
-        self.nsamples = 0
-        self.ssize = 0
-        self.nbits = 0
-        self.mem_offset = 0
-        self.reserved = 0
-        self.flags = 0
-        self.triggername = ""
-        # ZIO Address
-        self.addr = None
-        # ZIO Time Stamp
-        self.tstamp = None
-        # Device and Trigger Attributes
-        self.attr_channel = None
-        self.attr_trigger = None
-        # ZIO TLV
-        self.tlv = None
 
-    def getCtrl(self):
-        f = open(self.path, "r")
-        data = f.read(512)
-        f.close()
-        # This unpack the control structure element by element
-        ctrl = struct.unpack(self.packstring, data)
+    def isValid(self):
+        """The control must follow some rule. This function check if the value
+        in this control are valid"""
+        # nsamples must be pre_samples + post_samples
+        if self.nsamples != self.attr_trigger.std_val[1] + self.attr_trigger.std_val[2]:
+            return False
+        return True
+
+    def unpackToCtrl(self, binctrl):
+        """This function unpack a given binary control to fill the fields of
+        this class. It use the self.packstring class attribute to unpack"""
+        ctrl = struct.unpack(self.packstring, binctrl)
         # 4B
         self.major_version = ctrl[0]
         self.minor_version = ctrl[1]
@@ -102,16 +86,9 @@ class zCtrl(object):
         self.attr_trigger = zCtrlAttr(ctrl[81], ctrl[83], ctrl[84:100], \
                                       ctrl[100:132])
         self.tlv = zTLV(ctrl[132], ctrl[133], ctrl[134:142])
-        pass
 
-    def isValid(self):
-        # nsamples must be pre_samples + post_samples
-        if self.nsamples != self.attr_trigger.std_val[1] + self.attr_trigger.std_val[2]:
-            return False
-        return True
-
-    def setCtrl(self):
-        # Create pack_list because I cannot do multiple * in the same pack
+    def packToBin(self):
+        """This function pack this control into a binary control"""
         pack_list = []
         pack_list.append(self.major_version)
         pack_list.append(self.minor_version)
@@ -149,16 +126,28 @@ class zCtrl(object):
         pack_list.append(self.tlv.type)
         pack_list.append(self.tlv.len)
         pack_list.extend(self.tlv.val)
-        # Pack all the control value. use * to unpack list
-        ctrl = struct.pack(self.packstring, *pack_list)
-        # and write it
-        with open(self.path, 'w') as f:
-            try:
-                f.write(ctrl)
-            except IOError as e:
-                print("I/O error({0}): {1}".format(e.errno, e.strerror))
-                raise
-            except:
-                print("Unexpected error:", sys.exc_info()[0])
-                raise
-        pass
+        return struct.pack(self.packstring, *pack_list)
+
+    def clear(self):
+        # Control information
+        self.major_version = 0
+        self.minor_version = 0
+        self.alarms_zio = 0
+        self.alarms_dev = 0
+        self.seq_num = 0
+        self.nsamples = 0
+        self.ssize = 0
+        self.nbits = 0
+        self.mem_offset = 0
+        self.reserved = 0
+        self.flags = 0
+        self.triggername = ""
+        # ZIO Address
+        self.addr = None
+        # ZIO Time Stamp
+        self.tstamp = None
+        # Device and Trigger Attributes
+        self.attr_channel = None
+        self.attr_trigger = None
+        # ZIO TLV
+        self.tlv = None

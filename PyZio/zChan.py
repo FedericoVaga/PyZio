@@ -24,6 +24,7 @@ class zChan(object, zObject):
         zObject.__init__(self, path, name)
         self.currCtrl = None
         self.buffer = None
+        self.interfaceType = None
 
         # Inspect all files and directory
         for el in os.listdir(self.fullPath):
@@ -38,12 +39,23 @@ class zChan(object, zObject):
             if el == "current_control":
                 self.curctrl = zCtrl(os.path.join(self.fullPath, el))
                 continue
+            if el == "zio-cdev":
+                self.interfaceType = "cdev" # Init later, we need attributes
+                continue
             # Otherwise it is a generic attribute
             newAttr = zAttribute(self.fullPath, el)
             self.attribute[el] = newAttr
 
-        self.interface = zCharDevice(self)
-        pass
+        # Update the zObject children list
+        self.obj_children.append(self.buffer)
+        if self.interfaceType == None:
+            print("No interface available for " + self.fullPath)
+        elif self.interfaceType == "cdev":
+            # Set the interface to use (at the moment only Char Device)
+            self.interface = zCharDevice(self)
+        elif self.interfaceType == "socket":
+            pass
+
 
     def updateBuffer(self):
         """It updates the buffer object for this channel. If user change the
@@ -64,25 +76,3 @@ class zChan(object, zObject):
             self.currCtrl.setCtrl()
         return -errno.EINVAL
 
-
-    def readData(self, updateCtrl, unpackData):
-        """If the channel is enabled, it reads data from the device"""
-        if self.isEnable():
-            return self.interface.readData()
-        return -errno.EPERM
-
-    def writeData(self, data):
-        """If the channel is enabled, it writes data to the device"""
-        if self.isEnable():
-            self.interface.writeData(data)
-        return -errno.EPERM
-
-    def readCtrl(self, updateCtrl, unpackData):
-        """If the channel is enabled, it reads data from the device"""
-        if self.isEnable():
-            return self.interface.readCtrl()
-
-    def writeCtrl(self, ctrl):
-        """If the channel is enabled, it writes data to the device"""
-        if self.isEnable():
-            self.interface.writeCtrl(ctrl)
