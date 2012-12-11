@@ -1,8 +1,10 @@
 """
-@author: Federico Vaga
+@author: Federico Vaga <federico.vaga@gmail.com>
 @copyright: Federico Vaga 2012
 @license: GPLv2
 """
+
+import os
 
 class zInterface():
     """This class is a generic abstraction of a ZIO interface: Char Device
@@ -11,9 +13,12 @@ class zInterface():
         self.zio_interface_path = "/dev/zio/"
         self.zObj = zObj
         self.interface_prefix = self.zObj.attribute["address"].getValue()
-        self.isInput = False
-        self.isOutput = False
         self.ctrlFile = ""
         self.dataFile = ""
-        pass
+
+    def isInput(self):
+        return os.access(self.ctrlFile, os.R_OK)
+
+    def isOutput(self):
+        return os.access(self.ctrlFile, os.W_OK)
 

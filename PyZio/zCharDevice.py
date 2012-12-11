@@ -23,10 +23,6 @@ class zCharDevice(object, zInterface):
                                      self.interface_prefix + "-ctrl")
         self.dataFile = os.path.join(self.zio_interface_path, \
                                      self.interface_prefix + "-data")
-        # Set the char device directions
-        self.isOutput = os.access(self.ctrlFile, os.W_OK)
-        self.isIntput = os.access(self.ctrlFile, os.R_OK)
-        print("Cdev permission", self.isIntput, self.isOutput)
         # Block
         self.samples = None
         self.ctrl = None
@@ -67,13 +63,6 @@ class zCharDevice(object, zInterface):
     def isEnable(self):
         return self.cfgEnable
 
-    def isInput(self):
-        return os.access(self.ctrlFile, os.R_OK)
-
-    def isOutput(self):
-        return os.access(self.ctrlFile, os.W_OK)
-
-
     def setSamples(self, samples):
         """It sets the samples for the next write"""
         if os.access(self.dataFile, os.W_OK):
@@ -81,9 +70,7 @@ class zCharDevice(object, zInterface):
 
     def getSamples(self):
         """It returns the samples stored since the last read"""
-        print("i campioni")
         if os.access(self.dataFile, os.R_OK):
-            print("samples1", self.samples)
             return self.samples
         return None
 
@@ -104,7 +91,6 @@ class zCharDevice(object, zInterface):
     def readBlock(self):
         """It read the control and the samples of a block from char devices.
         It stores the block in self.ctrl and self.samples"""
-        print("reading block", os.access(self.ctrlFile, os.R_OK), self.zObj.isEnable())
 
         if os.access(self.ctrlFile, os.R_OK) and self.zObj.isEnable():
             size = 0 #FIXME
@@ -113,7 +99,6 @@ class zCharDevice(object, zInterface):
                 self.ctrl = zCtrl()
                 self.ctrl.unpackToCtrl(binCtrl)
                 size = self.ctrl.ssize * self.ctrl.nsamples
-                print(size)
             if self.cfgDataEnable:
                 self.samples = self.__readData(size)
 
