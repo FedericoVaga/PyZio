@@ -55,6 +55,8 @@ class zChan(object, zObject):
         elif self.interfaceType == "socket":
             pass
 
+    def isInterleaved(self):
+        return True if self.name == "chani" else False
 
     def updateBuffer(self):
         """It updates the buffer object for this channel. If user change the

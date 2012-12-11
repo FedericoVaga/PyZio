@@ -24,6 +24,7 @@ class zCset(object, zObject):
         self.chan = []
         # Associated trigger
         self.trigger = None
+        self.interleave = None
         # Look into directory for channels and attributes
         for el in os.listdir(self.fullPath):
             # Skip if invalid element
@@ -38,6 +39,8 @@ class zCset(object, zObject):
             if os.path.isdir(os.path.join(self.fullPath, el)):
                 newChan = zChan(self.fullPath, el)
                 self.chan.append(newChan)
+                if el == "chani":
+                    self.interleave = newChan
             # otherwise is an attribute
             else:
                 self.attribute[el] = zAttribute(self.fullPath, el)
@@ -45,6 +48,9 @@ class zCset(object, zObject):
         # Update the zObject children list
         self.obj_children.append(self.trigger)
         self.obj_children.extend(self.chan)
+
+    def isInterleaved(self):
+        return False if self.interleave == None else True
 
     def getCurrentBuffer(self):
         """It returns the current buffer for all channels within this device"""
