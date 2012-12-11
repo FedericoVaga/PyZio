@@ -20,7 +20,7 @@ class zAttribute(object):
 
         self.readable = True if os.access(self.fullPath, os.R_OK) else False
         self.writable = True if os.access(self.fullPath, os.W_OK) else False
-        print("Attribute found: " + self.fullPath)
+        #print("Attribute found: " + self.fullPath)
         self.getValue()
 
     def getValue(self):

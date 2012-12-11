@@ -15,7 +15,7 @@ class zObject():
         self.attribute = {} # dictionary for attributes
         self.obj_children = []
         self.invalidAttributes = ["power", "driver", "subsystem", "uevent"]
-        print("Object found: " + self.fullPath)
+        #print("Object found: " + self.fullPath)
 
     def isValidSysfsElement(self, name):
         """It returns if a sysfs name is valid or not"""
