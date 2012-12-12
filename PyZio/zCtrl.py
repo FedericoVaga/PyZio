@@ -27,7 +27,7 @@ class zAddress(object):
         self.dev_id = did
         self.cset_i = cset
         self.chan_i = chan
-        self.devname = dev
+        self.devname = dev.replace("\x00", "")
 
 class zTimeStamp(object):
     def __init__(self, s, t, b):
@@ -45,7 +45,8 @@ class zCtrl(object):
 
     def isValid(self):
         """The control must follow some rule. This function check if the value
-        in this control are valid"""
+        in this control are valid
+        FIXME ONLY FOR OUTPUT"""
         # nsamples must be pre_samples + post_samples
         if self.nsamples != self.attr_trigger.std_val[1] + self.attr_trigger.std_val[2]:
             return False
@@ -77,7 +78,7 @@ class zCtrl(object):
         self.reserved = ctrl[27]
         self.flags = ctrl[28]
         # 12s
-        self.triggername = ctrl[29]
+        self.triggername = ctrl[29].replace("\x00", "")
         # 2HI16I32I
         self.attr_channel = zCtrlAttr(ctrl[30], ctrl[32], ctrl[33:49], \
                                       ctrl[49:81])
