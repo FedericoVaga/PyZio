@@ -1,5 +1,5 @@
 """
-@author: Federico Vaga
+@author: Federico Vaga <federico.vaga@gmail.com>
 @copyright: Federico Vaga 2012
 @license: GPLv2
 """
@@ -16,6 +16,7 @@ class zCharDevice(object, zInterface):
     device: one for control and one for data. The have both the same file
     permission."""
     def __init__(self, zObj):
+        """Initialize zCharDevice class. zObj is the object which use this interface"""
         zInterface.__init__(self, zObj)
 
         # Set data and ctrl char devices
