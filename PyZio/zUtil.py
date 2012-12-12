@@ -24,6 +24,13 @@ def isLoaded():
         return False
     return True
 
+def getDevice(name):
+    """It returns the device object by name"""
+    for dev in devices:
+        if dev.getName == name:
+            break;
+    return dev
+
 '''
 updateDevices
 It updates the internal list of available devices
