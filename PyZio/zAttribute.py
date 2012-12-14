@@ -21,18 +21,15 @@ class zAttribute(object):
         self.readable = True if os.access(self.fullPath, os.R_OK) else False
         self.writable = True if os.access(self.fullPath, os.W_OK) else False
         #print("Attribute found: " + self.fullPath)
-        self.getValue()
 
     def getValue(self):
-        """It reads the sysfs file of the attribute and it store the value in
-        self.value. It returns also the read value."""
+        """It reads the sysfs file of the attribute and it returns the value"""
         if not self.readable:
             return -errno.EPERM
 
         with open(self.fullPath, "r") as f:
             try:
-                self.value = f.read().rstrip("\n\r")
-                return self.value
+                return f.read().rstrip("\n\r")
             except IOError as e:
                 print("I/O error({0}): {1}".format(e.errno, e.strerror))
             except:
@@ -40,11 +37,7 @@ class zAttribute(object):
                 raise
 
     def setValue(self, val):
-        """It writes the sysfs attribute with the val parameter. If no
-        error occurs, it stores the new value in self.value.
-        The function convert the value into string and it write on the
-        sysfs file. It does not matter if val is an integer or a string, this
-        function always convert to string before writing."""
+        """It writes the sysfs attribute with val."""
         if not self.writable:
             return -errno.EPERM
 
@@ -52,7 +45,6 @@ class zAttribute(object):
         with open(self.fullPath, "w") as f:
             try:
                 f.write(w)
-                self.value = val
             except IOError as e:
                 print("I/O error({0}): {1}".format(e.errno, e.strerror))
             except:
