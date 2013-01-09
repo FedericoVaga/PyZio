@@ -12,7 +12,7 @@ class zInterface():
     def __init__(self, zObj):
         self.zio_interface_path = "/dev/zio/"
         self.zObj = zObj
-        self.interface_prefix = self.zObj.attribute["address"].getValue()
+        self.interface_prefix = self.zObj.attribute["devname"].getValue()
         self.ctrlFile = ""
         self.dataFile = ""
 
