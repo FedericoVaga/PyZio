@@ -65,8 +65,9 @@ class zCharDevice(object, zInterface):
         if self.isInput() and self.zObj.isEnable():
 
             if rCtrl: # Read the control
-                with open(self.ctrlFile, 'r') as f:
-                    binCtrl = f.read(512)
+                fd = os.open(self.ctrlFile, os.O_RDONLY)
+                binCtrl = os.read(fd, 512)
+                os.close(fd)
                 ctrl = zCtrl()
                 self.lastCtrl = ctrl
                 ctrl.unpackToCtrl(binCtrl)
@@ -82,10 +83,11 @@ class zCharDevice(object, zInterface):
                         tmpctrl = self.lastCtrl
                 else:
                     tmpctrl = ctrl
-                with open(self.dataFile, "r") as f:
-                    data_tmp = f.read(tmpctrl.ssize * tmpctrl.nsamples)
-                    if self.cfgUnpackData:
-                        samples =  self.__unpack_data(data_tmp, tmpctrl.nsamples, tmpctrl.ssize)
+                fd = os.open(self.dataFile, os.O_RDONLY)
+                data_tmp = os.read(fd, tmpctrl.ssize * tmpctrl.nsamples)
+                os.close(fd)
+                if self.cfgUnpackData:
+                    samples =  self.__unpack_data(data_tmp, tmpctrl.nsamples, tmpctrl.ssize)
 
         return ctrl, samples
 
@@ -94,11 +96,13 @@ class zCharDevice(object, zInterface):
         device. User should edit ctrl and samples before write"""
         if self.isOutput() and self.zObj.isEnable():
             if isinstance(ctrl, zCtrl):
-                with open(self.ctrlFile, 'w') as f:
-                    f.write(ctrl.packToBin())
+                fd = os.open(self.ctrlFile, os.O_WRONLY)
+                os.write(fd, ctrl.packToBin())
+                os.close(fd)
             if samples != None:
-                with open(self.dataFile, "w") as f:
-                    f.write(samples)
+                fd = os.open(self.dataFile, os.O_WRONLY)
+                os.write(fd, samples)
+                os.close(fd)
 
 
     # # # # # PRIVATE FUNCTIONS # # # # #
