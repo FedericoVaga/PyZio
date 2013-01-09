@@ -16,9 +16,19 @@ class zInterface():
         self.ctrlFile = ""
         self.dataFile = ""
 
-    def isInput(self):
+    def is_ctrl_readable(self):
+        """It returns if you can read control from device"""
         return os.access(self.ctrlFile, os.R_OK)
 
-    def isOutput(self):
+    def is_ctrl_writable(self):
+        """It returns if you can write control into device"""
         return os.access(self.ctrlFile, os.W_OK)
+
+    def is_data_readable(self):
+        """It returns if you can read data from device"""
+        return os.access(self.dataFile, os.R_OK)
+
+    def is_data_writable(self):
+        """It returns if you can write data into device"""
+        return os.access(self.dataFile, os.W_OK)
 
