@@ -13,13 +13,13 @@ class zCtrlAttr(object):
         self.std_val = list(sattr)
         self.ext_val = list(eattr)
 
-class zTLV(object):
+class ZioTLV(object):
     def __init__(self, t, l, v):
         self.type = t
         self.len = l
         self.val = v
 
-class zAddress(object):
+class ZioAddress(object):
     def __init__(self, fam, htype, hid, did, cset, chan, dev):
         self.sa_family = fam
         self.host_type = htype
@@ -29,13 +29,13 @@ class zAddress(object):
         self.chan_i = chan
         self.devname = dev.replace("\x00", "")
 
-class zTimeStamp(object):
+class ZioTimeStamp(object):
     def __init__(self, s, t, b):
         self.seconds = s
         self.ticks = t
         self.bins = b
 
-class zCtrl(object):
+class ZioCtrl(object):
     def __init__(self):
         # Description of the control structure field's length
         self.packstring = "4B2I2H1H2B8BI2H12s3Q3I12s2HI16I32I2HI16I32I2I8B"
@@ -43,7 +43,7 @@ class zCtrl(object):
         self.clear()
 
 
-    def isValid(self):
+    def is_valid(self):
         """The control must follow some rule. This function check if the value
         in this control are valid
         FIXME ONLY FOR OUTPUT"""
@@ -52,7 +52,7 @@ class zCtrl(object):
             return False
         return True
 
-    def unpackToCtrl(self, binctrl):
+    def unpack_to_ctrl(self, binctrl):
         """This function unpack a given binary control to fill the fields of
         this class. It use the self.packstring class attribute to unpack"""
         ctrl = struct.unpack(self.packstring, binctrl)
@@ -69,10 +69,10 @@ class zCtrl(object):
         self.nbits = ctrl[7]
         # 1H2B8BI2H12s
         # ctrl[10] is a filler
-        self.addr = zAddress(ctrl[8], ctrl[9], ctrl[11:19], \
+        self.addr = ZioAddress(ctrl[8], ctrl[9], ctrl[11:19], \
                              ctrl[19], ctrl[20], ctrl[21], ctrl[22])
         # 3Q
-        self.tstamp = zTimeStamp(ctrl[23], ctrl[24], ctrl[25]);
+        self.tstamp = ZioTimeStamp(ctrl[23], ctrl[24], ctrl[25]);
         # 3I
         self.mem_offset = ctrl[26]
         self.reserved = ctrl[27]
@@ -85,9 +85,9 @@ class zCtrl(object):
         # 2HI16I32I
         self.attr_trigger = zCtrlAttr(ctrl[81], ctrl[83], ctrl[84:100], \
                                       ctrl[100:132])
-        self.tlv = zTLV(ctrl[132], ctrl[133], ctrl[134:142])
+        self.tlv = ZioTLV(ctrl[132], ctrl[133], ctrl[134:142])
 
-    def packToBin(self):
+    def pack_to_bin(self):
         """This function pack this control into a binary control"""
         pack_list = []
         pack_list.append(self.major_version)
