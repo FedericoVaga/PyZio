@@ -6,7 +6,6 @@
 
 import os
 import stat
-import string
 from PyZio.ZioConfig import zio_bus_path, devices_path, devices, \
                             buffers, triggers
 
@@ -40,7 +39,7 @@ def update_devices():
     """It updates the internal list of available devices"""
     del devices[:]
     for zdev in os.listdir(devices_path):
-        if string.find(zdev, "hw-") == 0:
+        if "hw-" in zdev:
             continue
         devices.append(zdev)
 
