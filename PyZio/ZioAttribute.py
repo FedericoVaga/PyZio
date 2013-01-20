@@ -6,7 +6,7 @@
 from PyZio.ZioUtil import is_readable, is_writable
 import os
 
-class ZioAttribute(object):
+class ZioAttribute:
     """This class handle a single ZIO attribute. It allow only two operations:
     read and write."""
 

@@ -10,7 +10,7 @@ import struct
 from PyZio.ZioInterface import ZioInterface
 from PyZio.ZioCtrl import ZioCtrl
 
-class ZioCharDevice(object, ZioInterface):
+class ZioCharDevice(ZioInterface):
     """This class represent the Char Device interface of ZIO. It has to char
     device: one for control and one for data. The have both the same file
     permission."""

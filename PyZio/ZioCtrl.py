@@ -6,20 +6,20 @@
 
 import struct
 
-class zCtrlAttr(object):
+class zCtrlAttr:
     def __init__(self, sm, em, sattr, eattr):
         self.std_mask = sm
         self.ext_mask = em
         self.std_val = list(sattr)
         self.ext_val = list(eattr)
 
-class ZioTLV(object):
+class ZioTLV:
     def __init__(self, t, l, v):
         self.type = t
         self.len = l
         self.val = v
 
-class ZioAddress(object):
+class ZioAddress:
     def __init__(self, fam, htype, hid, did, cset, chan, dev):
         self.sa_family = fam
         self.host_type = htype
@@ -29,13 +29,13 @@ class ZioAddress(object):
         self.chan_i = chan
         self.devname = dev.replace("\x00", "")
 
-class ZioTimeStamp(object):
+class ZioTimeStamp:
     def __init__(self, s, t, b):
         self.seconds = s
         self.ticks = t
         self.bins = b
 
-class ZioCtrl(object):
+class ZioCtrl:
     def __init__(self):
         # Description of the control structure field's length
         self.packstring = "4B2I2H1H2B8BI2H12s3Q3I12s2HI16I32I2HI16I32I2I8B"

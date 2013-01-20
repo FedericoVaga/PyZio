@@ -8,7 +8,7 @@ import os
 from PyZio.ZioObject import ZioObject
 from PyZio.ZioAttribute import ZioAttribute
 
-class ZioBuf(object, ZioObject):
+class ZioBuf(ZioObject):
     """This class describe the zio_bi object from the ZIO framework. It
     inherits from zObject"""
 

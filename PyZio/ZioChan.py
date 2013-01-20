@@ -10,7 +10,7 @@ from PyZio.ZioBuf import ZioBuf
 from PyZio.ZioCtrl import ZioCtrl
 from PyZio.ZioCharDevice import ZioCharDevice
 
-class ZioChan(object, ZioObject):
+class ZioChan(ZioObject):
     """This class describes the zio_channel object from the ZIO framework. It
     inherits from zObject"""
 

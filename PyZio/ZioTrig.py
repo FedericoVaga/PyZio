@@ -8,7 +8,7 @@ import os
 from PyZio.ZioObject import ZioObject
 from PyZio.ZioAttribute import ZioAttribute
 
-class ZioTrig(object, ZioObject):
+class ZioTrig(ZioObject):
     """It describes the zio_ti object from the ZIO framework. It
     inherits from zObject"""
 

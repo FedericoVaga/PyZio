@@ -9,7 +9,7 @@ from PyZio.ZioObject import ZioObject
 from PyZio.ZioAttribute import ZioAttribute
 from PyZio.ZioCset import ZioCset
 
-class ZioDev(object, ZioObject):
+class ZioDev(ZioObject):
     """It describes the zio_device object from the ZIO framework. It
     inherits from zObject"""
 

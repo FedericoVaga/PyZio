@@ -11,7 +11,7 @@ from PyZio.ZioChan import ZioChan
 from PyZio.ZioTrig import ZioTrig
 
 
-class ZioCset(object, ZioObject):
+class ZioCset(ZioObject):
     """zCset class describe the zio_cset object from the ZIO framework. It
     inherits from zObject"""
 
