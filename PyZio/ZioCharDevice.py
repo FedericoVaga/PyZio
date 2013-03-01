@@ -108,7 +108,7 @@ class ZioCharDevice(ZioInterface):
         else:
             return data_tmp
 
-    def read_block(self, rctrl, rdata):
+    def read_block(self, rctrl, rdata, unpack = True):
         """It read the control and the samples of a block from char devices.
         It stores the last control in self.lastCtrl. The parameter rctrl and
         rdata are boolean value: if True they acquire the associated
@@ -125,7 +125,7 @@ class ZioCharDevice(ZioInterface):
             ctrl = self.read_ctrl()
 
         if rdata: # Read the data
-            samples = self.read_data(ctrl)
+            samples = self.read_data(ctrl, unpack)
             
         return ctrl, samples
 
