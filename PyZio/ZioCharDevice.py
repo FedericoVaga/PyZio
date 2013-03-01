@@ -16,10 +16,12 @@ class ZioCharDevice(ZioInterface):
     permission."""
 
     def __init__(self, zobj):
-        """Initialize zCharDevice class. the zobj parameter is the object
+        """Initialize ZioCharDevice class. The zobj parameter is the object
         which use this interface. This object should be a channel"""
         ZioInterface.__init__(self, zobj)
 
+        self.fdc = None
+        self.fdd = None
         # Set data and ctrl char devices
         self.ctrlfile = os.path.join(self.zio_interface_path, \
                                      self.interface_prefix + "-ctrl")
@@ -37,6 +39,84 @@ class ZioCharDevice(ZioInterface):
     def is_unpack_data(self):
         return self.cfg_unpack_data
 
+
+    def fileno_ctrl(self):
+        """Return ctrl char device file descriptor"""
+        return self.fdc
+    def fileno_data(self):
+        """Return data char device file descriptor"""
+        return self.fdd
+
+    def open_ctrl_data(self, perm):
+        self.open_ctrl(perm)
+        self.open_data(perm)
+        
+    def open_data(self, perm):
+        """Open data char device"""
+        if self.fdd == None:
+            self.fdd = os.open(self.datafile, perm)
+        else:
+            print("File already open")
+    def open_ctrl(self, perm):
+        """Open ctrl char device"""
+        if self.fdc == None:
+            self.fdc = os.open(self.ctrlfile, perm)
+        else:
+            print("File already open")
+
+    def close_ctrl_data(self):
+        self.close_ctrl()
+        self.close_data()
+        
+    def close_data(self):
+        """Close data char device"""
+        if self.fdd != None:
+            os.close(self.fdd)
+            self.fdd = None
+    def close_ctrl(self):
+        """Close ctrl char device"""
+        if self.fdc != None:
+            os.close(self.fdc)
+            self.fdc = None
+
+
+    def read_ctrl(self):
+        """If the control char device is open and it is readable, then it reads
+        the control structure. Every time it internally store the control; it
+        will be used as default when no control is provided"""
+        if self.fdc == None or not self.is_ctrl_readable():
+            return None
+        # Read the control
+        bin_ctrl = os.read(self.fdc, 512)
+        
+        ctrl = ZioCtrl()
+        self.lastctrl = ctrl
+        ctrl.unpack_to_ctrl(bin_ctrl)
+        return ctrl
+
+    def read_data(self, ctrl = None, unpack = True):
+        """If the data char device is open and it is readable, then it reads
+        the data"""
+        if self.fdd == None or not self.is_data_readable():
+            return None
+        
+        if ctrl == None:
+            if self.lastCtrl == None:
+                print("WARNING: you never read control, then only 16byte will be read")
+                tmpctrl = ZioCtrl()
+                tmpctrl.ssize = 1
+                tmpctrl.nsamples = 16
+            else:
+                tmpctrl = self.lastCtrl
+        else:
+            tmpctrl = ctrl
+            
+        data_tmp = os.read(self.fdd, tmpctrl.ssize * tmpctrl.nsamples)
+        if unpack:
+            return self.__unpack_data(data_tmp, tmpctrl.nsamples, tmpctrl.ssize)
+        else:
+            return data_tmp
+
     def read_block(self, rctrl, rdata):
         """It read the control and the samples of a block from char devices.
         It stores the last control in self.lastCtrl. The parameter rctrl and
@@ -45,34 +125,20 @@ class ZioCharDevice(ZioInterface):
         ctrl = None
         samples = None
 
-        if self.is_ctrl_readable() and rctrl:
-            # Read the control
-            fd = os.open(self.ctrlfile, os.O_RDONLY)
-            bin_ctrl = os.read(fd, 512)
-            os.close(fd)
-            ctrl = ZioCtrl()
-            self.lastctrl = ctrl
-            ctrl.unpack_to_ctrl(bin_ctrl)
+        if self.fdc == None:
+            self.open_ctrl(os.O_RDONLY)
+        if self.fdd == None:
+            self.open_data(os.O_RDONLY)
 
-        if self.is_data_readable() and rdata: # Read the data
-            if ctrl == None:
-                if self.lastCtrl == None:
-                    print("WARNING: you never read control, then only 16byte will be read")
-                    tmpctrl = ZioCtrl()
-                    tmpctrl.ssize = 1
-                    tmpctrl.nsamples = 16
-                else:
-                    tmpctrl = self.lastCtrl
-            else:
-                tmpctrl = ctrl
-            fd = os.open(self.datafile, os.O_RDONLY)
-            data_tmp = os.read(fd, tmpctrl.ssize * tmpctrl.nsamples)
-            os.close(fd)
-            if self.cfg_unpack_data:
-                samples =  self.__unpack_data(data_tmp, tmpctrl.nsamples, tmpctrl.ssize)
+        if rctrl:
+            ctrl = self.read_ctrl()
 
+        if rdata: # Read the data
+            samples = self.read_data(ctrl)
+            
         return ctrl, samples
 
+    # FIXME must be rewritten
     def write_block(self, ctrl, samples):
         """It writes the control and the samples of this class to the char
         device. User should edit ctrl and samples before write"""
@@ -92,7 +158,7 @@ class ZioCharDevice(ZioInterface):
 
     # # # # # PRIVATE FUNCTIONS # # # # #
     def __unpack_data(self, data, nsamples, ssize):
-        """It unpacks data in a list of nsampples elements"""
+        """It unpacks data in a list of nsamples elements"""
         fmt = "b"
         if ssize == 1:
             fmt = "B"
