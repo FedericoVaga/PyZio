@@ -29,15 +29,6 @@ class ZioCharDevice(ZioInterface):
                                      self.interface_prefix + "-data")
 
         self.lastctrl = None
-        # Options
-        self.cfg_unpack_data = True
-        pass
-
-    def set_unpack_data(self, status):
-        self.cfg_unpack_data = status
-
-    def is_unpack_data(self):
-        return self.cfg_unpack_data
 
 
     def fileno_ctrl(self):
