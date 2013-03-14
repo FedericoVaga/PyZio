@@ -148,6 +148,17 @@ class ZioCharDevice(ZioInterface):
             raise #FIXME define zio exception
 
 
+    def is_device_ready(self, timeout = 0):
+        ret = self.select(True, True, timeout)
+        if ret == None:  # Check if it is possible to access device
+            return False
+        
+        for l in ret:
+            if len(l) > 0:  # If a list is not empty, then device is ready
+                return True
+
+        return False
+
     def select(self, rctrl, rdata, timeout = None):
         """It select() both control and data. It returns None if it is not
         possibile to select() char devices; otherwise, it returns the select()
