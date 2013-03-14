@@ -6,6 +6,7 @@
 
 import os
 import struct
+import select
 
 from PyZio.ZioInterface import ZioInterface
 from PyZio.ZioCtrl import ZioCtrl
@@ -147,6 +148,23 @@ class ZioCharDevice(ZioInterface):
             raise #FIXME define zio exception
 
 
+    def select(self, rctrl, rdata, timeout = None):
+        """It select() both control and data. It returns None if it is not
+        possibile to select() char devices; otherwise, it returns the select()
+        output"""
+        lst = []
+
+        if rctrl:
+            lst.append(self.fdc)
+        if rdata:
+            lst.append(self.fdd)
+
+        if self.is_ctrl_writable() and self.is_data_writable():
+            return select.select([], lst, [], timeout)
+        elif self.is_ctrl_readable() and self.is_data_readable():
+            return select.select(lst, [], [], timeout)
+        else:
+            return None
     # # # # # PRIVATE FUNCTIONS # # # # #
     def __unpack_data(self, data, nsamples, ssize):
         """It unpacks data in a list of nsamples elements"""
