@@ -42,7 +42,7 @@ class ZioCharDevice(ZioInterface):
     def open_ctrl_data(self, perm):
         self.open_ctrl(perm)
         self.open_data(perm)
-        
+
     def open_data(self, perm):
         """Open data char device"""
         if self.fdd == None:
@@ -59,7 +59,7 @@ class ZioCharDevice(ZioInterface):
     def close_ctrl_data(self):
         self.close_ctrl()
         self.close_data()
-        
+
     def close_data(self):
         """Close data char device"""
         if self.fdd != None:
@@ -80,7 +80,7 @@ class ZioCharDevice(ZioInterface):
             return None
         # Read the control
         bin_ctrl = os.read(self.fdc, 512)
-        
+
         ctrl = ZioCtrl()
         self.lastctrl = ctrl
         ctrl.unpack_to_ctrl(bin_ctrl)
@@ -91,7 +91,7 @@ class ZioCharDevice(ZioInterface):
         the data"""
         if self.fdd == None or not self.is_data_readable():
             return None
-        
+
         if ctrl == None:
             if self.lastCtrl == None:
                 print("WARNING: you never read control, then only 16byte will be read")
@@ -102,7 +102,7 @@ class ZioCharDevice(ZioInterface):
                 tmpctrl = self.lastCtrl
         else:
             tmpctrl = ctrl
-            
+
         data_tmp = os.read(self.fdd, tmpctrl.ssize * tmpctrl.nsamples)
         if unpack:
             return self.__unpack_data(data_tmp, tmpctrl.nsamples, tmpctrl.ssize)
@@ -127,32 +127,15 @@ class ZioCharDevice(ZioInterface):
 
         if rdata: # Read the data
             samples = self.read_data(ctrl, unpack)
-            
-        return ctrl, samples
 
-    # FIXME must be rewritten
-    def write_block(self, ctrl, samples):
-        """It writes the control and the samples of this class to the char
-        device. User should edit ctrl and samples before write"""
-        if self.is_ctrl_writable() and isinstance(ctrl, ZioCtrl):
-            fd = os.open(self.ctrlfile, os.O_WRONLY)
-            os.write(fd, ctrl.pack_to_bin())
-            os.close(fd)
-        else:
-            raise #FIXME define zio exception
-        if self.is_data_writable() and samples != None:
-            fd = os.open(self.datafile, os.O_WRONLY)
-            os.write(fd, samples)
-            os.close(fd)
-        else:
-            raise #FIXME define zio exception
+        return ctrl, samples
 
 
     def is_device_ready(self, timeout = 0):
         ret = self.select(True, True, timeout)
         if ret == None:  # Check if it is possible to access device
             return False
-        
+
         for l in ret:
             if len(l) > 0:  # If a list is not empty, then device is ready
                 return True
