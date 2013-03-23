@@ -5,7 +5,6 @@
 """
 
 import os
-import struct
 import select
 
 from PyZio.ZioInterface import ZioInterface
@@ -105,7 +104,7 @@ class ZioCharDevice(ZioInterface):
 
         data_tmp = os.read(self.fdd, tmpctrl.ssize * tmpctrl.nsamples)
         if unpack:
-            return self.__unpack_data(data_tmp, tmpctrl.nsamples, tmpctrl.ssize)
+            return self._unpack_data(data_tmp, tmpctrl.nsamples, tmpctrl.ssize)
         else:
             return data_tmp
 
@@ -159,16 +158,3 @@ class ZioCharDevice(ZioInterface):
             return select.select(lst, [], [], timeout)
         else:
             return None
-    # # # # # PRIVATE FUNCTIONS # # # # #
-    def __unpack_data(self, data, nsamples, ssize):
-        """It unpacks data in a list of nsamples elements"""
-        fmt = "b"
-        if ssize == 1:
-            fmt = "B"
-        elif ssize == 2:
-            fmt = "H"
-        elif ssize == 4:
-            fmt = "I"
-        elif ssize == 8:
-            fmt = "Q"
-        return struct.unpack((str(nsamples) + fmt), data)

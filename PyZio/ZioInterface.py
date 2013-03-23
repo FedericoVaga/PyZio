@@ -4,6 +4,7 @@
 @license: GPLv2
 """
 from PyZio.ZioUtil import is_readable, is_writable
+import struct
 
 class ZioInterface:
     """
@@ -141,3 +142,18 @@ class ZioInterface:
         and samples to a channel
         """
         raise NotImplementedError
+
+    def _unpack_data(self, data, nsamples, ssize):
+        """
+        It unpacks 'data' of nsamples elements of the same size 'ssize'
+        """
+        fmt = "b"
+        if ssize == 1:
+            fmt = "B"
+        elif ssize == 2:
+            fmt = "H"
+        elif ssize == 4:
+            fmt = "I"
+        elif ssize == 8:
+            fmt = "Q"
+        return struct.unpack((str(nsamples) + fmt), data)
