@@ -10,8 +10,10 @@ class ZioInterface:
     """
     It is a generic abstraction of a ZIO interface: Char Device and socket.
     """
+
+    zio_interface_path = "/dev/zio/"
+
     def __init__(self, zobj):
-        self.zio_interface_path = "/dev/zio/"
         self.zobj = zobj
         self.interface_prefix = self.zobj.attribute["devname"].get_value()
         self.ctrlfile = "" # Full path to the control file
