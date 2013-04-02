@@ -117,7 +117,7 @@ class ZioInterface:
         """
         raise NotImplementedError
 
-    def read_block(self, rctrl, rdata, unpack = True):
+    def read_block(self, rctrl = True, rdata = True, unpack = True):
         """
         It is a mandatory method for the derived class. It reads, and returns,
         a block from a channel. The block is a python set with control and
