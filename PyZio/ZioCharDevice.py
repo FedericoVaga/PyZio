@@ -28,9 +28,6 @@ class ZioCharDevice(ZioInterface):
         self.datafile = os.path.join(self.zio_interface_path, \
                                      self.interface_prefix + "-data")
 
-        self.lastctrl = None
-
-
     def fileno_ctrl(self):
         """Return ctrl char device file descriptor"""
         return self.__fdc

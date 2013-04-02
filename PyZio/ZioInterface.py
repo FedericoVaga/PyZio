@@ -18,6 +18,7 @@ class ZioInterface:
         self.interface_prefix = self.zobj.attribute["devname"].get_value()
         self.ctrlfile = "" # Full path to the control file
         self.datafile = "" # Full path to the data file
+        self.lastctrl = None
 
     def is_ctrl_readable(self):
         """
