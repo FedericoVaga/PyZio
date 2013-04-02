@@ -20,8 +20,8 @@ class ZioCharDevice(ZioInterface):
         which use this interface. This object should be a channel"""
         ZioInterface.__init__(self, zobj)
 
-        self.fdc = None
-        self.fdd = None
+        self.__fdc = None
+        self.__fdd = None
         # Set data and ctrl char devices
         self.ctrlfile = os.path.join(self.zio_interface_path, \
                                      self.interface_prefix + "-ctrl")
@@ -33,10 +33,10 @@ class ZioCharDevice(ZioInterface):
 
     def fileno_ctrl(self):
         """Return ctrl char device file descriptor"""
-        return self.fdc
+        return self.__fdc
     def fileno_data(self):
         """Return data char device file descriptor"""
-        return self.fdd
+        return self.__fdd
 
     def open_ctrl_data(self, perm):
         self.open_ctrl(perm)
@@ -44,14 +44,14 @@ class ZioCharDevice(ZioInterface):
 
     def open_data(self, perm):
         """Open data char device"""
-        if self.fdd == None:
-            self.fdd = os.open(self.datafile, perm)
+        if self.__fdd == None:
+            self.__fdd = os.open(self.datafile, perm)
         else:
             print("File already open")
     def open_ctrl(self, perm):
         """Open ctrl char device"""
-        if self.fdc == None:
-            self.fdc = os.open(self.ctrlfile, perm)
+        if self.__fdc == None:
+            self.__fdc = os.open(self.ctrlfile, perm)
         else:
             print("File already open")
 
@@ -61,24 +61,24 @@ class ZioCharDevice(ZioInterface):
 
     def close_data(self):
         """Close data char device"""
-        if self.fdd != None:
-            os.close(self.fdd)
-            self.fdd = None
+        if self.__fdd != None:
+            os.close(self.__fdd)
+            self.__fdd = None
     def close_ctrl(self):
         """Close ctrl char device"""
-        if self.fdc != None:
-            os.close(self.fdc)
-            self.fdc = None
+        if self.__fdc != None:
+            os.close(self.__fdc)
+            self.__fdc = None
 
 
     def read_ctrl(self):
         """If the control char device is open and it is readable, then it reads
         the control structure. Every time it internally store the control; it
         will be used as default when no control is provided"""
-        if self.fdc == None or not self.is_ctrl_readable():
+        if self.__fdc == None or not self.is_ctrl_readable():
             return None
         # Read the control
-        bin_ctrl = os.read(self.fdc, 512)
+        bin_ctrl = os.read(self.__fdc, 512)
 
         ctrl = ZioCtrl()
         self.lastctrl = ctrl
@@ -88,7 +88,7 @@ class ZioCharDevice(ZioInterface):
     def read_data(self, ctrl = None, unpack = True):
         """If the data char device is open and it is readable, then it reads
         the data"""
-        if self.fdd == None or not self.is_data_readable():
+        if self.__fdd == None or not self.is_data_readable():
             return None
 
         if ctrl == None:
@@ -102,7 +102,7 @@ class ZioCharDevice(ZioInterface):
         else:
             tmpctrl = ctrl
 
-        data_tmp = os.read(self.fdd, tmpctrl.ssize * tmpctrl.nsamples)
+        data_tmp = os.read(self.__fdd, tmpctrl.ssize * tmpctrl.nsamples)
         if unpack:
             return self._unpack_data(data_tmp, tmpctrl.nsamples, tmpctrl.ssize)
         else:
@@ -116,9 +116,9 @@ class ZioCharDevice(ZioInterface):
         ctrl = None
         samples = None
 
-        if self.fdc == None:
+        if self.__fdc == None:
             self.open_ctrl(os.O_RDONLY)
-        if self.fdd == None:
+        if self.__fdd == None:
             self.open_data(os.O_RDONLY)
 
         if rctrl:
@@ -148,9 +148,9 @@ class ZioCharDevice(ZioInterface):
         lst = []
 
         if rctrl:
-            lst.append(self.fdc)
+            lst.append(self.__fdc)
         if rdata:
-            lst.append(self.fdd)
+            lst.append(self.__fdd)
 
         if self.is_ctrl_writable() and self.is_data_writable():
             return select.select([], lst, [], timeout)
