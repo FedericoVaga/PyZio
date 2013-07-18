@@ -13,6 +13,23 @@ class zCtrlAttr:
         self.std_val = list(sattr)
         self.ext_val = list(eattr)
 
+    def __eq__(self, other):
+        if not isinstance(other, zCtrlAttr):
+            return False
+
+        ret = True
+        ret = ret and self.std_mask == other.std_mask
+        ret = ret and self.ext_mask == other.ext_mask
+        for val1, val2 in zip(self.std_val, other.std_val):
+            ret = ret and val1 == val2
+        for val1, val2 in zip(self.ext_val, other.ext_val):
+            ret = ret and val1 == val2
+
+        return ret
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
 class ZioTLV:
     def __init__(self, t, l, v):
         self.type = t
@@ -29,11 +46,28 @@ class ZioAddress:
         self.chan_i = chan
         self.devname = dev.replace("\x00", "")
 
+    def __eq__(self, other):
+        if not isinstance(other, ZioAddress):
+            return False
+        return self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
 class ZioTimeStamp:
     def __init__(self, s, t, b):
         self.seconds = s
         self.ticks = t
         self.bins = b
+
+    def __eq__(self, other):
+        if not isinstance(other, ZioTimeStamp):
+            return False
+
+        return self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
 class ZioCtrl:
     def __init__(self):
@@ -42,6 +76,36 @@ class ZioCtrl:
         #                  ^ ^ ^ ^           ^ ^ ^  ^        ^        ^
         self.clear()
 
+    def __eq__(self, other):
+        print("confronto1")
+        if not isinstance(other, ZioCtrl):
+            return False
+
+        print("confronto1")
+        ret = True
+        # Fields
+        ret = ret and self.major_version == other.major_version
+        ret = ret and self.minor_version == other.minor_version
+        ret = ret and self.alarms_zio == other.alarms_zio
+        ret = ret and self.alarms_dev == other.alarms_dev
+        ret = ret and self.seq_num == other.seq_num
+        ret = ret and self.nsamples == other.nsamples
+        ret = ret and self.ssize == other.ssize
+        ret = ret and self.nbits == other.nbits
+        ret = ret and self.mem_offset == other.mem_offset
+        ret = ret and self.reserved == other.reserved
+        ret = ret and self.flags == other.flags
+        # Objects
+        ret = ret and self.addr == other.addr
+        ret = ret and self.tstamp == other.tstamp
+        ret = ret and self.triggername == other.triggername
+        ret = ret and self.attr_channel == other.attr_channel
+        ret = ret and self.attr_trigger == other.attr_trigger
+
+        return ret
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
     def is_valid(self):
         """The control must follow some rule. This function check if the value
@@ -100,7 +164,7 @@ class ZioCtrl:
         pack_list.append(self.nbits)
         pack_list.append(self.addr.sa_family)
         pack_list.append(self.addr.host_type)
-        pack_list.append(0) # filler
+        pack_list.append(0)  # filler
         pack_list.extend(self.addr.hostid)
         pack_list.append(self.addr.dev_id)
         pack_list.append(self.addr.cset_i)
@@ -114,12 +178,12 @@ class ZioCtrl:
         pack_list.append(self.flags)
         pack_list.append(self.triggername)
         pack_list.append(self.attr_channel.std_mask)
-        pack_list.append(0) # filler
+        pack_list.append(0)  # filler
         pack_list.append(self.attr_channel.ext_mask)
         pack_list.extend(self.attr_channel.std_val)
         pack_list.extend(self.attr_channel.ext_val)
         pack_list.append(self.attr_trigger.std_mask)
-        pack_list.append(0) # filler
+        pack_list.append(0)  # filler
         pack_list.append(self.attr_trigger.ext_mask)
         pack_list.extend(self.attr_trigger.std_val)
         pack_list.extend(self.attr_trigger.ext_val)
