@@ -19,7 +19,7 @@ class ZioCharDevice(ZioInterface):
         """Initialize ZioCharDevice class. The zobj parameter is the object
         which use this interface. This object should be a channel"""
         ZioInterface.__init__(self, zobj)
-
+        self.lastctrl = None
         self.__fdc = None
         self.__fdd = None
         # Set data and ctrl char devices
@@ -89,13 +89,13 @@ class ZioCharDevice(ZioInterface):
             return None
 
         if ctrl == None:
-            if self.lastCtrl == None:
+            if self.lastctrl == None:
                 print("WARNING: you never read control, then only 16byte will be read")
                 tmpctrl = ZioCtrl()
                 tmpctrl.ssize = 1
                 tmpctrl.nsamples = 16
             else:
-                tmpctrl = self.lastCtrl
+                tmpctrl = self.lastctrl
         else:
             tmpctrl = ctrl
 
@@ -113,15 +113,15 @@ class ZioCharDevice(ZioInterface):
         ctrl = None
         samples = None
 
-        if self.__fdc == None:
+        if rctrl and self.__fdc == None:
             self.open_ctrl(os.O_RDONLY)
-        if self.__fdd == None:
+        if rdata and self.__fdd == None:
             self.open_data(os.O_RDONLY)
 
         if rctrl:
             ctrl = self.read_ctrl()
 
-        if rdata: # Read the data
+        if rdata:  # Read the data
             samples = self.read_data(ctrl, unpack)
 
         return ctrl, samples
@@ -144,9 +144,9 @@ class ZioCharDevice(ZioInterface):
         output"""
         lst = []
 
-        if rctrl:
+        if rctrl and self.__fdc != None:
             lst.append(self.__fdc)
-        if rdata:
+        if rdata and self.__fdd != None:
             lst.append(self.__fdd)
 
         if self.is_ctrl_writable() and self.is_data_writable():
