@@ -77,11 +77,9 @@ class ZioCtrl:
         self.clear()
 
     def __eq__(self, other):
-        print("confronto1")
         if not isinstance(other, ZioCtrl):
             return False
 
-        print("confronto1")
         ret = True
         # Fields
         ret = ret and self.major_version == other.major_version
