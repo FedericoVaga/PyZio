@@ -10,6 +10,7 @@ from PyZio.ZioAttribute import ZioAttribute
 from PyZio.ZioBuf import ZioBuf
 from PyZio.ZioCtrl import ZioCtrl
 from PyZio.ZioCharDevice import ZioCharDevice
+from PyZio.ZioError import ZioInvalidControl
 
 class ZioChan(ZioObject):
     """
@@ -79,7 +80,7 @@ class ZioChan(ZioObject):
             bin_ctrl = os.read(fd_num, 512)
             os.close(fd_num)
         except:
-            return None
+            raise
         else:
             ctrl = ZioCtrl()
             ctrl.unpack_to_ctrl(bin_ctrl)
@@ -89,10 +90,12 @@ class ZioChan(ZioObject):
         """
         It sets the current control.
         """
-        if isinstance(ctrl, ZioCtrl) and ctrl.is_valid():
+        if not (isinstance(ctrl, ZioCtrl) and ctrl.is_valid()):
+            raise ZioInvalidControl(ctrl)
+
+        try:
             fd_num = os.open(self.cur_ctrl, os.O_WRONLY)
             os.write(fd_num, ctrl.pack_to_bin())
             os.close(fd_num)
-        else:
-            raise # FIXME choose correct exception
-
+        except:
+            raise
