@@ -17,7 +17,7 @@ class ZioTrig(ZioObject):
         initialization; then it looks for attributes in its directory. All
         valid files within trigger directory are attributes"""
         ZioObject.__init__(self, path, name)
-        for el in os.listdir(self.fullpath):
-            if not self.is_valid_sysfs_element(el):
+        for tmp in os.listdir(self.fullpath):
+            if not self.is_valid_sysfs_element(tmp):
                 continue
-            self.attribute[el] = ZioAttribute(self.fullpath, el)
+            self.attribute[tmp] = ZioAttribute(self.fullpath, tmp)

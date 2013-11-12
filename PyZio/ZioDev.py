@@ -21,13 +21,13 @@ class ZioDev(ZioObject):
         set"""
         ZioObject.__init__(self, path, name)
         self.cset = [] # List of children cset
-        for el in os.listdir(self.fullpath):
-            if not self.is_valid_sysfs_element(el): # Skip if invalid element
+        for tmp in os.listdir(self.fullpath):
+            if not self.is_valid_sysfs_element(tmp): # Skip if invalid element
                 continue
-            if os.path.isdir(os.path.join(self.fullpath, el)): # Subdirs are csets
-                newcset = ZioCset(self.fullpath, el)
+            if os.path.isdir(os.path.join(self.fullpath, tmp)): # Subdirs are csets
+                newcset = ZioCset(self.fullpath, tmp)
                 self.cset.append(newcset)
             else: # otherwise is an attribute
-                self.attribute[el] = ZioAttribute(self.fullpath, el)
+                self.attribute[tmp] = ZioAttribute(self.fullpath, tmp)
 
         self.obj_children.extend(self.cset) # Update the zObject children list

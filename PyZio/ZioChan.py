@@ -25,22 +25,22 @@ class ZioChan(ZioObject):
         self.interface_type = None
 
         # Inspect all files and directory
-        for el in os.listdir(self.fullpath):
+        for tmp in os.listdir(self.fullpath):
             # Skip if the element it is not valid
-            if not self.is_valid_sysfs_element(el):
+            if not self.is_valid_sysfs_element(tmp):
                 continue
             # If the element is "buffer" then create a zBuf instance
-            if el == "buffer" and os.path.isdir(os.path.join(self.fullpath, el)):
-                self.buffer = ZioBuf(self.fullpath, el)
+            if tmp == "buffer" and os.path.isdir(os.path.join(self.fullpath, tmp)):
+                self.buffer = ZioBuf(self.fullpath, tmp)
                 continue
-            if el == "current-control":
-                self.cur_ctrl = os.path.join(self.fullpath, el)
+            if tmp == "current-control":
+                self.cur_ctrl = os.path.join(self.fullpath, tmp)
                 continue
-            if el == "zio-cdev" and os.path.isdir(os.path.join(self.fullpath, el)):
+            if tmp == "zio-cdev" and os.path.isdir(os.path.join(self.fullpath, tmp)):
                 self.interface_type = "cdev" # Init later, we need attributes
                 continue
             # Otherwise it is a generic attribute
-            self.attribute[el] = ZioAttribute(self.fullpath, el)
+            self.attribute[tmp] = ZioAttribute(self.fullpath, tmp)
         # Update the zObject children list
         self.obj_children.append(self.buffer)
         if self.interface_type == None:

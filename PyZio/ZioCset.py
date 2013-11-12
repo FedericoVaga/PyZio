@@ -26,20 +26,20 @@ class ZioCset(ZioObject):
         self.trigger = None # Associated trigger
         self.interleave = None # Interleaved channel
 
-        for el in os.listdir(self.fullpath):
-            if not self.is_valid_sysfs_element(el): # Skip if invalid element
+        for tmp in os.listdir(self.fullpath):
+            if not self.is_valid_sysfs_element(tmp): # Skip if invalid element
                 continue
-            if el == "trigger" and os.path.isdir(os.path.join(self.fullpath, el)):
-                self.trigger = ZioTrig(self.fullpath, el)
+            if tmp == "trigger" and os.path.isdir(os.path.join(self.fullpath, tmp)):
+                self.trigger = ZioTrig(self.fullpath, tmp)
                 continue
 
-            if os.path.isdir(os.path.join(self.fullpath, el)): # Subdir is a channel
-                newchan = ZioChan(self.fullpath, el)
+            if os.path.isdir(os.path.join(self.fullpath, tmp)): # Subdir is a channel
+                newchan = ZioChan(self.fullpath, tmp)
                 self.chan.append(newchan)
-                if el == "chani":
+                if tmp == "chani":
                     self.interleave = newchan
             else: # otherwise is an attribute
-                self.attribute[el] = ZioAttribute(self.fullpath, el)
+                self.attribute[tmp] = ZioAttribute(self.fullpath, tmp)
 
         # Update the zObject children list
         self.obj_children.append(self.trigger)

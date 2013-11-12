@@ -19,12 +19,12 @@ class ZioBuf(ZioObject):
         ZioObject.__init__(self, path, name)
         self.__flush_attr = None
         # Inspect all files and directory
-        for el in os.listdir(self.fullpath):
+        for tmp in os.listdir(self.fullpath):
             # Skip if the element it is not valid
-            if not self.is_valid_sysfs_element(el):
+            if not self.is_valid_sysfs_element(tmp):
                 continue
             # All the valid element are attributes
-            self.attribute[el] = ZioAttribute(self.fullpath, el)
+            self.attribute[tmp] = ZioAttribute(self.fullpath, tmp)
 
     def flush(self):
         """It flush the buffer"""
