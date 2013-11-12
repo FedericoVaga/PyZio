@@ -6,7 +6,7 @@
 
 import struct
 
-class zCtrlAttr:
+class ZioCtrlAttr:
     def __init__(self, sm, em, sattr, eattr):
         self.std_mask = sm
         self.ext_mask = em
@@ -14,7 +14,7 @@ class zCtrlAttr:
         self.ext_val = list(eattr)
 
     def __eq__(self, other):
-        if not isinstance(other, zCtrlAttr):
+        if not isinstance(other, ZioCtrlAttr):
             return False
 
         ret = True
@@ -142,10 +142,10 @@ class ZioCtrl:
         # 12s
         self.triggername = ctrl[29].replace("\x00", "")
         # 2HI16I32I
-        self.attr_channel = zCtrlAttr(ctrl[30], ctrl[32], ctrl[33:49], \
+        self.attr_channel = ZioCtrlAttr(ctrl[30], ctrl[32], ctrl[33:49], \
                                       ctrl[49:81])
         # 2HI16I32I
-        self.attr_trigger = zCtrlAttr(ctrl[81], ctrl[83], ctrl[84:100], \
+        self.attr_trigger = ZioCtrlAttr(ctrl[81], ctrl[83], ctrl[84:100], \
                                       ctrl[100:132])
         self.tlv = ZioTLV(ctrl[132], ctrl[133], ctrl[134:142])
 
