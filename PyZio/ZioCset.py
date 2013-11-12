@@ -65,6 +65,9 @@ class ZioCset(ZioObject):
         It sets the current buffer for all channels within this cset. Then
         update the buffer for each channel
         """
+        if not "current_buffer" in self.attribute:
+            raise # FIXME choose correct exception
+        
         self.attribute["current_buffer"].set_value(buftype)
         for chan in self.chan:
             chan.update_buffer()
@@ -73,6 +76,9 @@ class ZioCset(ZioObject):
         """
         It returns a string with the current trigger name
         """
+        if not "current_trigger" in self.attribute:
+            raise # FIXME choose correct exception
+        
         return self.attribute["current_trigger"].get_value()
 
     def set_current_trigger(self, trigtype):
@@ -80,6 +86,9 @@ class ZioCset(ZioObject):
         It sets the current trigger for this cset. and change the trigger
         instance
         """
+        if not "current_trigger" in self.attribute:
+            raise # FIXME choose correct exception
+
         self.attribute["current_trigger"].set_value(trigtype)
         fullpath = self.trigger.path
         self.trigger = ZioTrig(fullpath, "trigger")
