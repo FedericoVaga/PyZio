@@ -27,5 +27,8 @@ class ZioBuf(ZioObject):
             self.attribute[tmp] = ZioAttribute(self.fullpath, tmp)
 
     def flush(self):
-        """It flush the buffer"""
-        self.attribute["flush"].set_value(1)
+        """
+        It does 'flush' on the buffer
+        """
+        if "flush" in self.attribute:
+            self.attribute["flush"].set_value(1)
