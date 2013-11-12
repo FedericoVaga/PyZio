@@ -8,6 +8,5 @@ from PyZio.ZioInterface import ZioInterface
 
 class ZioSocket(ZioInterface):
     def __init__(self, zobj):
-        self.zobj = zobj
-        self.fullpath = self.zObj.attribute["devname"].get_value()
+        ZioInterface.__init__(self, zobj)
 

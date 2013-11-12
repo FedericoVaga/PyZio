@@ -7,6 +7,9 @@
 import struct
 
 class ZioCtrlAttr(object):
+    """
+    It represent the python version of the zio_ctrl_attr structure
+    """
     def __init__(self, sm, em, sattr, eattr):
         self.std_mask = sm
         self.ext_mask = em
@@ -31,12 +34,18 @@ class ZioCtrlAttr(object):
         return not self.__eq__(other)
 
 class ZioTLV(object):
+    """
+    It represent the python version of the zio_tlv structure
+    """
     def __init__(self, t, l, v):
         self.type = t
         self.len = l
         self.val = v
 
 class ZioAddress(object):
+    """
+    It represent the python version of the zio_addr structure
+    """
     def __init__(self, fam, htype, hid, did, cset, chan, dev):
         self.sa_family = fam
         self.host_type = htype
@@ -55,6 +64,9 @@ class ZioAddress(object):
         return not self.__eq__(other)
 
 class ZioTimeStamp(object):
+    """
+    It represent the python version of the zio_timestamp structure
+    """
     def __init__(self, s, t, b):
         self.seconds = s
         self.ticks = t
@@ -70,11 +82,37 @@ class ZioTimeStamp(object):
         return not self.__eq__(other)
 
 class ZioCtrl(object):
+    """
+    It represent the python verion of the zio_control structure
+    """
+
     def __init__(self):
         # Description of the control structure field's length
         self.packstring = "4B2I2H1H2B8BI2H12s3Q3I12s2HI16I32I2HI16I32I2I8B"
         #                  ^ ^ ^ ^           ^ ^ ^  ^        ^        ^
-        self.clear()
+
+        # Control information
+        self.major_version = 0
+        self.minor_version = 0
+        self.alarms_zio = 0
+        self.alarms_dev = 0
+        self.seq_num = 0
+        self.nsamples = 0
+        self.ssize = 0
+        self.nbits = 0
+        self.mem_offset = 0
+        self.reserved = 0
+        self.flags = 0
+        self.triggername = ""
+        # ZIO Address
+        self.addr = None
+        # ZIO Time Stamp
+        self.tstamp = None
+        # Device and Trigger Attributes
+        self.attr_channel = None
+        self.attr_trigger = None
+        # ZIO TLV
+        self.tlv = None
 
     def __eq__(self, other):
         if not isinstance(other, ZioCtrl):
@@ -106,17 +144,23 @@ class ZioCtrl(object):
         return not self.__eq__(other)
 
     def is_valid(self):
-        """The control must follow some rule. This function check if the value
+        """
+        The control must follow some rule. This function check if the value
         in this control are valid
-        FIXME ONLY FOR OUTPUT"""
+        FIXME ONLY FOR OUTPUT
+        """
         # nsamples must be pre_samples + post_samples
-        if self.nsamples != self.attr_trigger.std_val[1] + self.attr_trigger.std_val[2]:
+        attr_nsamples = self.attr_trigger.std_val[1] \
+                      + self.attr_trigger.std_val[2]
+        if self.nsamples != attr_nsamples:
             return False
         return True
 
     def unpack_to_ctrl(self, binctrl):
-        """This function unpack a given binary control to fill the fields of
-        this class. It use the self.packstring class attribute to unpack"""
+        """
+        This function unpack a given binary control to fill the fields of
+        this class. It use the self.packstring class attribute to unpack
+        """
         ctrl = struct.unpack(self.packstring, binctrl)
         # 4B
         self.major_version = ctrl[0]
@@ -132,9 +176,9 @@ class ZioCtrl(object):
         # 1H2B8BI2H12s
         # ctrl[10] is a filler
         self.addr = ZioAddress(ctrl[8], ctrl[9], ctrl[11:19], \
-                             ctrl[19], ctrl[20], ctrl[21], ctrl[22])
+                               ctrl[19], ctrl[20], ctrl[21], ctrl[22])
         # 3Q
-        self.tstamp = ZioTimeStamp(ctrl[23], ctrl[24], ctrl[25]);
+        self.tstamp = ZioTimeStamp(ctrl[23], ctrl[24], ctrl[25])
         # 3I
         self.mem_offset = ctrl[26]
         self.reserved = ctrl[27]
@@ -191,25 +235,7 @@ class ZioCtrl(object):
         return struct.pack(self.packstring, *pack_list)
 
     def clear(self):
-        # Control information
-        self.major_version = 0
-        self.minor_version = 0
-        self.alarms_zio = 0
-        self.alarms_dev = 0
-        self.seq_num = 0
-        self.nsamples = 0
-        self.ssize = 0
-        self.nbits = 0
-        self.mem_offset = 0
-        self.reserved = 0
-        self.flags = 0
-        self.triggername = ""
-        # ZIO Address
-        self.addr = None
-        # ZIO Time Stamp
-        self.tstamp = None
-        # Device and Trigger Attributes
-        self.attr_channel = None
-        self.attr_trigger = None
-        # ZIO TLV
-        self.tlv = None
+        """
+        It clears the content of the class
+        """
+        self.__init__()
