@@ -102,7 +102,7 @@ class ZioInterface:
         raise NotImplementedError
 
 
-    # Mantatory Read/Write Methods
+    # Mandatory Read/Write Methods
     def read_ctrl(self):
         """
         It is a mandatory method for the derived class. It reads, and returns,
