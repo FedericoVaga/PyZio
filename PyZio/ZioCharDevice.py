@@ -110,7 +110,7 @@ class ZioCharDevice(ZioInterface):
 
         if ctrl == None:
             if self.lastctrl == None:
-                print("WARNING: you never read control, then only 16byte will be read")
+                print("WARNING: you never read control, only 16 samples read")
                 tmpctrl = ZioCtrl()
                 tmpctrl.ssize = 1
                 tmpctrl.nsamples = 16
@@ -125,7 +125,7 @@ class ZioCharDevice(ZioInterface):
         else:
             return data_tmp
 
-    def read_block(self, rctrl, rdata, unpack = True):
+    def read_block(self, rctrl = True, rdata = True, unpack = True):
         """
         It read the control and the samples of a block from char devices.
         It stores the last control in self.lastCtrl. The parameter rctrl and
@@ -148,14 +148,22 @@ class ZioCharDevice(ZioInterface):
 
         return ctrl, samples
 
+    def write_ctrl(self, ctrl):
+        raise NotImplementedError
+
+    def write_data(self, samples):
+        raise NotImplementedError
+
+    def write_block(self, ctrl, samples):
+        raise NotImplementedError
 
     def is_device_ready(self, timeout = 0):
         ret = self.select(True, True, timeout)
         if ret == None:  # Check if it is possible to access device
             return False
 
-        for l in ret:
-            if len(l) > 0:  # If a list is not empty, then device is ready
+        for rlist in ret:
+            if len(rlist) > 0:  # If a list is not empty, then device is ready
                 return True
 
         return False

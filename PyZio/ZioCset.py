@@ -67,7 +67,7 @@ class ZioCset(ZioObject):
         """
         self.attribute["current_buffer"].set_value(buftype)
         for chan in self.chan:
-            chan.update_buffer();
+            chan.update_buffer()
 
     def get_current_trigger(self):
         """
@@ -81,5 +81,5 @@ class ZioCset(ZioObject):
         instance
         """
         self.attribute["current_trigger"].set_value(trigtype)
-        fullpath = self.trigger.path;
+        fullpath = self.trigger.path
         self.trigger = ZioTrig(fullpath, "trigger")

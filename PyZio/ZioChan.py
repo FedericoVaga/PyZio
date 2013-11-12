@@ -75,14 +75,13 @@ class ZioChan(ZioObject):
         method of zCtrl; user can use directly that method
         """
         try:
-            fd = os.open(self.cur_ctrl, os.O_RDONLY)
-            bin_ctrl = os.read(fd, 512)
-            os.close(fd)
+            fd_num = os.open(self.cur_ctrl, os.O_RDONLY)
+            bin_ctrl = os.read(fd_num, 512)
+            os.close(fd_num)
         except:
             return None
         else:
             ctrl = ZioCtrl()
-            self.lastctrl = ctrl
             ctrl.unpack_to_ctrl(bin_ctrl)
             return ctrl
 
@@ -91,9 +90,9 @@ class ZioChan(ZioObject):
         It sets the current control.
         """
         if isinstance(ctrl, ZioCtrl) and ctrl.is_valid():
-            fd = os.open(self.cur_ctrl, os.O_WRONLY)
-            os.write(fd, ctrl.pack_to_bin())
-            os.close(fd)
+            fd_num = os.open(self.cur_ctrl, os.O_WRONLY)
+            os.write(fd_num, ctrl.pack_to_bin())
+            os.close(fd_num)
         else:
             raise # FIXME choose correct exception
 
