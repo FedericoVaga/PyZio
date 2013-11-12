@@ -8,9 +8,9 @@ import os
 
 class ZioAttribute:
     """
-    This class handle a single ZIO attribute. It allow only two operations:
-    read and write. All methods do not handle exception, so the pass to higher
-    class that must handle errors.
+    This class handles a single ZIO attribute. It allows only two operations:
+    read and write. Class' methods do not handle exceptions, so higher classes
+    that use this one must handle errors.
     """
 
     def __init__(self, path, name):

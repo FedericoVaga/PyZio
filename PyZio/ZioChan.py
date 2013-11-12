@@ -12,14 +12,17 @@ from PyZio.ZioCtrl import ZioCtrl
 from PyZio.ZioCharDevice import ZioCharDevice
 
 class ZioChan(ZioObject):
-    """This class describes the zio_channel object from the ZIO framework. It
-    inherits from zObject"""
+    """
+    This class describes the zio_channel object from the ZIO framework.
+    """
 
     def __init__(self, path, name):
-        """It calls the __init__ function from zObject for a generic
+        """
+        It calls the __init__ function from ZioObject for a generic
         initialization; then it looks for attributes and buffer in its
         directory. All valid files are normal attributes. A directory can be a
-        buffer or an interface."""
+        buffer or an interface.
+        """
         ZioObject.__init__(self, path, name)
         self.cur_ctrl = None
         self.buffer = None
@@ -53,18 +56,24 @@ class ZioChan(ZioObject):
             pass
 
     def is_interleaved(self):
-        """It returns True if this is an interleaved channel"""
+        """
+        It returns True if this is an interleaved channel
+        """
         return True if self.name == "chani" else False
 
     def update_buffer(self):
-        """It updates the buffer object for this channel. If user changes the
+        """
+        It updates the buffer object for this channel. If user changes the
         current buffer from cset, then channel instance of the buffer must be
-        updated"""
+        updated
+        """
         self.buffer = ZioBuf(self.fullpath, "buffer")
 
     def get_current_ctrl(self):
-        """It gets the current control. It is only a wrapper of the setCtrl
-        method of zCtrl; user can use directly that method"""
+        """
+        It gets the current control. It is only a wrapper of the setCtrl
+        method of zCtrl; user can use directly that method
+        """
         try:
             fd = os.open(self.cur_ctrl, os.O_RDONLY)
             bin_ctrl = os.read(fd, 512)
@@ -78,7 +87,9 @@ class ZioChan(ZioObject):
             return ctrl
 
     def set_current_ctrl(self, ctrl):
-        """It set the current control."""
+        """
+        It sets the current control.
+        """
         if isinstance(ctrl, ZioCtrl) and ctrl.is_valid():
             fd = os.open(self.cur_ctrl, os.O_WRONLY)
             os.write(fd, ctrl.pack_to_bin())

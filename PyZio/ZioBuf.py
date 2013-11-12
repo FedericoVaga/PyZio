@@ -9,13 +9,16 @@ from PyZio.ZioObject import ZioObject
 from PyZio.ZioAttribute import ZioAttribute
 
 class ZioBuf(ZioObject):
-    """This class describe the zio_bi object from the ZIO framework. It
-    inherits from zObject"""
+    """
+    This class describes the zio_bi object from the ZIO framework.
+    """
 
     def __init__(self, path, name):
-        """It calls the __init__ functionfrom zObject for a generic
+        """
+        It calls the __init__ function from ZioObject for a generic
         initialization; then it looks for attributes in its directory: all
-        valid files within its directory are buffers's attributes"""
+        valid files within its directory are buffers's attributes
+        """
         ZioObject.__init__(self, path, name)
         self.__flush_attr = None
         # Inspect all files and directory

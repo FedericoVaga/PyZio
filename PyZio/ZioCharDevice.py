@@ -11,13 +11,17 @@ from PyZio.ZioInterface import ZioInterface
 from PyZio.ZioCtrl import ZioCtrl
 
 class ZioCharDevice(ZioInterface):
-    """This class represent the Char Device interface of ZIO. It has to char
-    device: one for control and one for data. The have both the same file
-    permission."""
+    """
+    This class represent the Char Device interface of ZIO. It has two char
+    devices: one for control and one for data. The have both the same file
+    permission.
+    """
 
     def __init__(self, zobj):
-        """Initialize ZioCharDevice class. The zobj parameter is the object
-        which use this interface. This object should be a channel"""
+        """
+        Initialize ZioCharDevice class. The zobj parameter is the object
+        which use this interface. This object should be a channel
+        """
         ZioInterface.__init__(self, zobj)
         self.lastctrl = None
         self.__fdc = None
@@ -29,10 +33,14 @@ class ZioCharDevice(ZioInterface):
                                      self.interface_prefix + "-data")
 
     def fileno_ctrl(self):
-        """Return ctrl char device file descriptor"""
+        """
+        Return ctrl char device file descriptor
+        """
         return self.__fdc
     def fileno_data(self):
-        """Return data char device file descriptor"""
+        """
+        Return data char device file descriptor
+        """
         return self.__fdd
 
     def open_ctrl_data(self, perm):
@@ -40,13 +48,17 @@ class ZioCharDevice(ZioInterface):
         self.open_data(perm)
 
     def open_data(self, perm):
-        """Open data char device"""
+        """
+        Open data char device
+        """
         if self.__fdd == None:
             self.__fdd = os.open(self.datafile, perm)
         else:
             print("File already open")
     def open_ctrl(self, perm):
-        """Open ctrl char device"""
+        """
+        Open ctrl char device
+        """
         if self.__fdc == None:
             self.__fdc = os.open(self.ctrlfile, perm)
         else:
@@ -57,21 +69,27 @@ class ZioCharDevice(ZioInterface):
         self.close_data()
 
     def close_data(self):
-        """Close data char device"""
+        """
+        Close data char device
+        """
         if self.__fdd != None:
             os.close(self.__fdd)
             self.__fdd = None
     def close_ctrl(self):
-        """Close ctrl char device"""
+        """
+        Close ctrl char device
+        """
         if self.__fdc != None:
             os.close(self.__fdc)
             self.__fdc = None
 
 
     def read_ctrl(self):
-        """If the control char device is open and it is readable, then it reads
+        """
+        If the control char device is open and it is readable, then it reads
         the control structure. Every time it internally store the control; it
-        will be used as default when no control is provided"""
+        will be used as default when no control is provided
+        """
         if self.__fdc == None or not self.is_ctrl_readable():
             return None
         # Read the control
@@ -83,8 +101,10 @@ class ZioCharDevice(ZioInterface):
         return ctrl
 
     def read_data(self, ctrl = None, unpack = True):
-        """If the data char device is open and it is readable, then it reads
-        the data"""
+        """
+        If the data char device is open and it is readable, then it reads
+        the data
+        """
         if self.__fdd == None or not self.is_data_readable():
             return None
 
@@ -106,10 +126,12 @@ class ZioCharDevice(ZioInterface):
             return data_tmp
 
     def read_block(self, rctrl, rdata, unpack = True):
-        """It read the control and the samples of a block from char devices.
+        """
+        It read the control and the samples of a block from char devices.
         It stores the last control in self.lastCtrl. The parameter rctrl and
         rdata are boolean value: if True they acquire the associated
-        information"""
+        information
+        """
         ctrl = None
         samples = None
 
@@ -139,9 +161,11 @@ class ZioCharDevice(ZioInterface):
         return False
 
     def select(self, rctrl, rdata, timeout = None):
-        """It select() both control and data. It returns None if it is not
-        possibile to select() char devices; otherwise, it returns the select()
-        output"""
+        """
+        It select() both control and data. It returns None if it is not
+        possible to select() char devices; otherwise, it returns the select()
+        output
+        """
         lst = []
 
         if rctrl and self.__fdc != None:

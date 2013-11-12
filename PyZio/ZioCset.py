@@ -12,15 +12,18 @@ from PyZio.ZioTrig import ZioTrig
 
 
 class ZioCset(ZioObject):
-    """zCset class describe the zio_cset object from the ZIO framework. It
-    inherits from zObject"""
+    """
+    ZioCset class describe the zio_cset object from the ZIO framework.
+    """
 
     def __init__(self, path, name):
-        """It calls the __init__ function from zObject for a generic
+        """
+        It calls the __init__ function from ZioObject for a generic
         initialization; then it looks for attributes, channels and trigger in
         its directory. Valid directory are channels except the 'trigger'
         directory; all valid files are attributes. The list of children object
-        is made of trigger and channels."""
+        is made of trigger and channels.
+        """
         ZioObject.__init__(self, path, name) # Initialize zObject
         self.chan = [] # List of channel children
         self.trigger = None # Associated trigger
@@ -46,27 +49,37 @@ class ZioCset(ZioObject):
         self.obj_children.extend(self.chan)
 
     def is_interleaved(self):
-        """It returns True is the cset is interleave capable"""
+        """
+        It returns True is the cset is interleave capable
+        """
         return False if self.interleave == None else True
 
     def get_current_buffer(self):
-        """It returns the current buffer for all channels within this device"""
+        """
+        It returns the current buffer for all channels within this device
+        """
         return self.attribute["current_buffer"].get_value()
 
     def set_current_buffer(self, buftype):
-        """It sets the current buffer for all channels within this cset. Then
-        update the buffer for each channel"""
+        """
+        It sets the current buffer for all channels within this cset. Then
+        update the buffer for each channel
+        """
         self.attribute["current_buffer"].set_value(buftype)
         for chan in self.chan:
             chan.update_buffer();
 
     def get_current_trigger(self):
-        """It returns a string with the current trigger name"""
+        """
+        It returns a string with the current trigger name
+        """
         return self.attribute["current_trigger"].get_value()
 
     def set_current_trigger(self, trigtype):
-        """It sets the current trigger for this cset. and change the trigger
-        instance"""
+        """
+        It sets the current trigger for this cset. and change the trigger
+        instance
+        """
         self.attribute["current_trigger"].set_value(trigtype)
         fullpath = self.trigger.path;
         self.trigger = ZioTrig(fullpath, "trigger")
