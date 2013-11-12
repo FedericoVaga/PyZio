@@ -4,7 +4,7 @@
 @license: GPLv2
 """
 import os
-
+from os.path import join, isdir
 from PyZio.ZioObject import ZioObject
 from PyZio.ZioAttribute import ZioAttribute
 from PyZio.ZioChan import ZioChan
@@ -29,11 +29,11 @@ class ZioCset(ZioObject):
         for tmp in os.listdir(self.fullpath):
             if not self.is_valid_sysfs_element(tmp): # Skip if invalid element
                 continue
-            if tmp == "trigger" and os.path.isdir(os.path.join(self.fullpath, tmp)):
+            if tmp == "trigger" and isdir(join(self.fullpath, tmp)):
                 self.trigger = ZioTrig(self.fullpath, tmp)
                 continue
 
-            if os.path.isdir(os.path.join(self.fullpath, tmp)): # Subdir is a channel
+            if isdir(join(self.fullpath, tmp)): # Subdir is a channel
                 newchan = ZioChan(self.fullpath, tmp)
                 self.chan.append(newchan)
                 if tmp == "chani":

@@ -4,7 +4,7 @@
 @license: GPLv2
 """
 import os
-
+from os.path import join, isdir
 from PyZio.ZioObject import ZioObject
 from PyZio.ZioAttribute import ZioAttribute
 from PyZio.ZioCset import ZioCset
@@ -24,7 +24,7 @@ class ZioDev(ZioObject):
         for tmp in os.listdir(self.fullpath):
             if not self.is_valid_sysfs_element(tmp): # Skip if invalid element
                 continue
-            if os.path.isdir(os.path.join(self.fullpath, tmp)): # Subdirs are csets
+            if isdir(join(self.fullpath, tmp)): # Subdirs are csets
                 newcset = ZioCset(self.fullpath, tmp)
                 self.cset.append(newcset)
             else: # otherwise is an attribute

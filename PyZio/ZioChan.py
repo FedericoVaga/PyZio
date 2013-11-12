@@ -4,6 +4,7 @@
 @license: GPLv2
 """
 import os
+from os.path import join, isdir
 from PyZio.ZioObject import ZioObject
 from PyZio.ZioAttribute import ZioAttribute
 from PyZio.ZioBuf import ZioBuf
@@ -30,13 +31,13 @@ class ZioChan(ZioObject):
             if not self.is_valid_sysfs_element(tmp):
                 continue
             # If the element is "buffer" then create a zBuf instance
-            if tmp == "buffer" and os.path.isdir(os.path.join(self.fullpath, tmp)):
+            if tmp == "buffer" and isdir(join(self.fullpath, tmp)):
                 self.buffer = ZioBuf(self.fullpath, tmp)
                 continue
             if tmp == "current-control":
-                self.cur_ctrl = os.path.join(self.fullpath, tmp)
+                self.cur_ctrl = join(self.fullpath, tmp)
                 continue
-            if tmp == "zio-cdev" and os.path.isdir(os.path.join(self.fullpath, tmp)):
+            if tmp == "zio-cdev" and isdir(join(self.fullpath, tmp)):
                 self.interface_type = "cdev" # Init later, we need attributes
                 continue
             # Otherwise it is a generic attribute
