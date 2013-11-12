@@ -9,6 +9,7 @@ from PyZio.ZioObject import ZioObject
 from PyZio.ZioAttribute import ZioAttribute
 from PyZio.ZioChan import ZioChan
 from PyZio.ZioTrig import ZioTrig
+from PyZio.ZioError import ZioMissingAttribute
 
 
 class ZioCset(ZioObject):
@@ -58,6 +59,9 @@ class ZioCset(ZioObject):
         """
         It returns the current buffer for all channels within this device
         """
+        if not "current_buffer" in self.attribute:
+            raise ZioMissingAttribute("current_buffer")
+
         return self.attribute["current_buffer"].get_value()
 
     def set_current_buffer(self, buftype):
@@ -66,8 +70,8 @@ class ZioCset(ZioObject):
         update the buffer for each channel
         """
         if not "current_buffer" in self.attribute:
-            raise # FIXME choose correct exception
-        
+            raise ZioMissingAttribute("current_buffer")
+
         self.attribute["current_buffer"].set_value(buftype)
         for chan in self.chan:
             chan.update_buffer()
@@ -77,8 +81,8 @@ class ZioCset(ZioObject):
         It returns a string with the current trigger name
         """
         if not "current_trigger" in self.attribute:
-            raise # FIXME choose correct exception
-        
+            raise ZioMissingAttribute("current_trigger")
+
         return self.attribute["current_trigger"].get_value()
 
     def set_current_trigger(self, trigtype):
@@ -87,7 +91,7 @@ class ZioCset(ZioObject):
         instance
         """
         if not "current_trigger" in self.attribute:
-            raise # FIXME choose correct exception
+            raise ZioMissingAttribute("current_trigger")
 
         self.attribute["current_trigger"].set_value(trigtype)
         fullpath = self.trigger.path
