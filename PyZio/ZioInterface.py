@@ -6,7 +6,7 @@
 from PyZio.ZioUtil import is_readable, is_writable
 import struct
 
-class ZioInterface:
+class ZioInterface(object):
     """
     It is a generic abstraction of a ZIO interface: Char Device and socket.
     """

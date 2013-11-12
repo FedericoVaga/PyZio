@@ -5,7 +5,7 @@
 """
 import os
 
-class ZioObject:
+class ZioObject(object):
     """
     It handles a generic ZIO object. It is an abstract class that export
     generic functions and attributes suitable for every objects.

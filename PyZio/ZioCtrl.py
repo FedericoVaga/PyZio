@@ -6,7 +6,7 @@
 
 import struct
 
-class ZioCtrlAttr:
+class ZioCtrlAttr(object):
     def __init__(self, sm, em, sattr, eattr):
         self.std_mask = sm
         self.ext_mask = em
@@ -30,13 +30,13 @@ class ZioCtrlAttr:
     def __ne__(self, other):
         return not self.__eq__(other)
 
-class ZioTLV:
+class ZioTLV(object):
     def __init__(self, t, l, v):
         self.type = t
         self.len = l
         self.val = v
 
-class ZioAddress:
+class ZioAddress(object):
     def __init__(self, fam, htype, hid, did, cset, chan, dev):
         self.sa_family = fam
         self.host_type = htype
@@ -54,7 +54,7 @@ class ZioAddress:
     def __ne__(self, other):
         return not self.__eq__(other)
 
-class ZioTimeStamp:
+class ZioTimeStamp(object):
     def __init__(self, s, t, b):
         self.seconds = s
         self.ticks = t
@@ -69,7 +69,7 @@ class ZioTimeStamp:
     def __ne__(self, other):
         return not self.__eq__(other)
 
-class ZioCtrl:
+class ZioCtrl(object):
     def __init__(self):
         # Description of the control structure field's length
         self.packstring = "4B2I2H1H2B8BI2H12s3Q3I12s2HI16I32I2HI16I32I2I8B"
