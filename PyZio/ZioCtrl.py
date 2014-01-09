@@ -33,6 +33,25 @@ class ZioCtrlAttr(object):
     def __ne__(self, other):
         return not self.__eq__(other)
 
+    def __str__(self):
+        out = "Ctrl: standard mask " + hex(self.std_mask) + "\n"
+        i = -1
+        for val in self.std_val:
+            i = i + 1
+            if not self.std_mask & (1 << i):
+                continue
+            out = out + "Ctrl: std attr {0} \t{1} \t{2}\n".format(i, hex(val), val)
+
+        out = out + "Ctrl: extended mask " + hex(self.ext_mask) + "\n"
+        i = -1
+        for val in self.ext_val:
+            i = i + 1
+            if not self.ext_mask & (1 << i):
+                continue
+            out = out + "Ctrl: ext attr {0} \t{1} \t{2}\n".format(i, hex(val), val)
+
+        return out
+
 class ZioTLV(object):
     """
     It represent the python version of the zio_tlv structure
@@ -63,6 +82,13 @@ class ZioAddress(object):
     def __ne__(self, other):
         return not self.__eq__(other)
 
+    def __str__(self):
+        out = "dev {0}-{1}, cset {2}, chan {3}".format(self.devname, \
+                                                       self.dev_id, \
+                                                       self.cset_i, \
+                                                       self.chan_i)
+        return out
+
 class ZioTimeStamp(object):
     """
     It represent the python version of the zio_timestamp structure
@@ -80,6 +106,9 @@ class ZioTimeStamp(object):
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def __str__(self):
+        return "{0}.{1} ({2})".format(self.seconds, self.ticks, self.bins)
 
 class ZioCtrl(object):
     """
@@ -142,6 +171,26 @@ class ZioCtrl(object):
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def __str__(self):
+        # Line 1
+        out = "Ctrl: version {0}.{1}, ".format(self.major_version, \
+                                               self.minor_version)
+        out = out + "trigger {0}, {1}\n".format(self.triggername, self.addr)
+        # line 2
+        out = out + "Ctrl: alarms {0} {1}\n".format(hex(self.alarms_zio), \
+                                                  hex(self.alarms_dev))
+        # line 3
+        out = out + "Ctrl: seq {0}, size {1}, bits {2}, flags {3}\n".format(\
+                    self.seq_num, self.ssize, self.nbits, hex(self.flags))
+        # line 4
+        out = out + "Ctrl: stamp {0}\n".format(self.tstamp)
+        # channel's attributes
+        out = out + "Ctrl: device attributes\n" + str(self.attr_channel)
+        # trigger's attributes
+        out = out + "Ctrl: trigger attributes\n" + str(self.attr_trigger)
+
+        return out
 
     def is_valid(self):
         """
