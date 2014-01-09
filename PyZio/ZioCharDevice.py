@@ -31,6 +31,7 @@ class ZioCharDevice(ZioInterface):
                                      self.interface_prefix + "-ctrl")
         self.datafile = os.path.join(self.zio_interface_path, \
                                      self.interface_prefix + "-data")
+        self.__poll = select.poll()
 
     def fileno_ctrl(self):
         """
@@ -53,6 +54,7 @@ class ZioCharDevice(ZioInterface):
         """
         if self.__fdd == None:
             self.__fdd = os.open(self.datafile, perm)
+            self.__poll.register(self.__fdd)
         else:
             print("File already open")
     def open_ctrl(self, perm):
@@ -61,6 +63,7 @@ class ZioCharDevice(ZioInterface):
         """
         if self.__fdc == None:
             self.__fdc = os.open(self.ctrlfile, perm)
+            self.__poll.register(self.__fdc)
         else:
             print("File already open")
 
@@ -73,6 +76,7 @@ class ZioCharDevice(ZioInterface):
         Close data char device
         """
         if self.__fdd != None:
+            self.__poll.unregister(self.__fdd)
             os.close(self.__fdd)
             self.__fdd = None
     def close_ctrl(self):
@@ -80,6 +84,7 @@ class ZioCharDevice(ZioInterface):
         Close ctrl char device
         """
         if self.__fdc != None:
+            self.__poll.unregister(self.__fdc)
             os.close(self.__fdc)
             self.__fdc = None
 
@@ -167,6 +172,15 @@ class ZioCharDevice(ZioInterface):
                 return True
 
         return False
+
+    def poll(self, timeout = None):
+        """
+        It poll() both control and data. IT return the Python's list of the 
+        events occurred on control or data
+        """
+        if timeout != None:
+            return self.__poll.poll(timeout)
+        return self.__poll.poll()
 
     def select(self, rctrl, rdata, timeout = None):
         """
