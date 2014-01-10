@@ -163,41 +163,23 @@ class ZioCharDevice(ZioInterface):
         raise NotImplementedError
 
     def is_device_ready(self, timeout = 0):
-        ret = self.select(True, True, timeout)
-        if ret == None:  # Check if it is possible to access device
-            return False
+        in_ready = False
+        out_ready = False
+        events = self.poll(timeout)
+        if len(events) == 0:  # Check if it is possible to access device
+            return False, False
 
-        for rlist in ret:
-            if len(rlist) > 0:  # If a list is not empty, then device is ready
-                return True
+        for __fd, flags in events:
+            if flags & (select.POLLIN | select.POLLPRI):
+                in_ready = True
+            elif flags & select.POLLOUT:
+                out_ready = True
 
-        return False
+        return in_ready, out_ready
 
     def poll(self, timeout = None):
         """
-        It poll() both control and data. IT return the Python's list of the 
+        It poll() both control and data. It return the Python's list of the
         events occurred on control or data
         """
-        if timeout != None:
-            return self.__poll.poll(timeout)
-        return self.__poll.poll()
-
-    def select(self, rctrl, rdata, timeout = None):
-        """
-        It select() both control and data. It returns None if it is not
-        possible to select() char devices; otherwise, it returns the select()
-        output
-        """
-        lst = []
-
-        if rctrl and self.__fdc != None:
-            lst.append(self.__fdc)
-        if rdata and self.__fdd != None:
-            lst.append(self.__fdd)
-
-        if self.is_ctrl_writable() and self.is_data_writable():
-            return select.select([], lst, [], timeout)
-        elif self.is_ctrl_readable() and self.is_data_readable():
-            return select.select(lst, [], [], timeout)
-        else:
-            return None
+        return self.__poll.poll(timeout)

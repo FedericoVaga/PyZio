@@ -47,10 +47,12 @@ class ZioInterface(object):
 
     def is_device_ready(self, timeout = 0):
         """
-        It is a mandatory method for the derived class. It must returns 'True'
-        if the device has a block ready. The optional parameter 'timeout' set
-        the time to wait before return. The '0' value mean immediately, 'None'
-        mean infinite, and a different value represent the seconds to wait.
+        It is a mandatory method for the derived class. It must returns two
+        boolean value: the first is 'True' if the device is ready to be read;
+        the second is 'True if the device is ready to be write'. The optional
+        parameter 'timeout' sets the time to wait before return. The '0' value
+        mean immediately, 'None' mean infinite, and a different value represent
+        the milliseconds to wait.
         """
         raise NotImplementedError
 
