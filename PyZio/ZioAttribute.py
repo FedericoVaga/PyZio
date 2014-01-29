@@ -4,7 +4,7 @@
 @license: GPLv2
 """
 from PyZio.ZioUtil import is_readable, is_writable
-import os
+import os, logging
 
 class ZioAttribute(object):
     """
@@ -17,6 +17,8 @@ class ZioAttribute(object):
         self.name = name
         self.path = path
         self.fullpath = os.path.join(path, name)
+
+        logging.debug("new attribute %s", self.fullpath)
 
     def is_readable(self):
         """

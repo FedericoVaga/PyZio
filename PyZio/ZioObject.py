@@ -3,7 +3,7 @@
 @copyright: Federico Vaga 2012
 @license: GPLv2
 """
-import os
+import os, logging
 
 class ZioObject(object):
     """
@@ -18,6 +18,8 @@ class ZioObject(object):
         self.attribute = {}     # Dictionary for boject's attributes
         self.obj_children = []  # List of children attributes
         self.invalid_attrs = ["power", "driver", "subsystem", "uevent"]
+
+        logging.debug("new %s %s", self.__class__.__name__, self.fullpath)
 
     def is_valid_sysfs_element(self, name):
         """

@@ -4,7 +4,7 @@
 @license: GPLv2
 """
 from PyZio.ZioUtil import is_readable, is_writable
-import struct
+import struct, logging
 
 class ZioInterface(object):
     """
@@ -19,6 +19,8 @@ class ZioInterface(object):
         self.ctrlfile = "" # Full path to the control file
         self.datafile = "" # Full path to the data file
         self.lastctrl = None
+
+        logging.debug("new %s", self.__class__.__name__)
 
     def is_ctrl_readable(self):
         """
