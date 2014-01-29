@@ -17,6 +17,8 @@ from .ZioObject import ZioObject
 from .ZioCtrl import ZioCtrl, ZioTimeStamp, ZioAddress, ZioCtrlAttr, ZioTLV
 from .ZioError import ZioError, ZioInvalidControl, ZioMissingAttribute
 from .ZioConfig import zio_bus_path, devices_path, triggers, buffers, devices
+from .ZioUtil import is_loaded, is_readable, is_writable, update_buffers, \
+                     update_triggers, update_devices, update_all_zio_objects
 
 __all__ = (
     "ZioAttribute",
@@ -39,5 +41,12 @@ __all__ = (
     "ZioInterface",
     "ZioObject",
     "ZioSocket",
-    "ZioTrig"
+    "ZioTrig",
+    "is_loaded",
+    "is_readable",
+    "is_writable",
+    "update_buffers",
+    "update_triggers",
+    "update_all_zio_objects",
+    "update_devices"
 )
